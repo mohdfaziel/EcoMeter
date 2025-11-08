@@ -116,15 +116,13 @@ async def load_model():
         ])
         
         # Fit with sample data (this is just for demo - replace with actual training)
-        import numpy as np
         X_sample = np.array([[2.0, 4, 8.0], [3.5, 6, 10.0], [5.0, 8, 15.0]])
         y_sample = np.array([180.0, 244.0, 350.0])
         model_pipeline.fit(X_sample, y_sample)
         logger.warning("Fallback model created and fitted with sample data")
     
+    # Test the model with a sample prediction
     try:
-        
-        # Test the model with a sample prediction
         test_input = np.array([[3.5, 6, 10.0]])
         test_prediction = model_pipeline.predict(test_input)
         logger.info(f"Model test successful. Sample prediction: {test_prediction[0]:.2f}")
