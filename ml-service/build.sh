@@ -1,24 +1,19 @@
-# Render Build Script for ML Service
 #!/bin/bash
 
 echo "🤖 Building ML Service..."
 
-# Install system dependencies if needed
-apt-get update && apt-get install -y curl
+# Ensure we're in the ml-service directory
+cd ml-service || exit 1
 
-# Install Python dependencies
-pip install --no-cache-dir -r requirements.txt
+# Upgrade pip first
+python -m pip install --upgrade pip
 
-# Copy model artifacts if they exist
-if [ -d "../model_artifacts" ]; then
-    echo "📁 Copying model artifacts..."
-    cp -r ../model_artifacts ./
-elif [ -f "../model_artifacts/fuel_co2_pipeline_v1.pkl" ]; then
-    echo "📦 Copying model file..."
-    mkdir -p model_artifacts
-    cp ../model_artifacts/fuel_co2_pipeline_v1.pkl ./model_artifacts/
-else
-    echo "⚠️ Model artifacts not found, will use fallback model"
-fi
+# Install wheel for faster builds
+pip install wheel
+
+# Install Python dependencies with specific index to avoid compilation
+pip install --only-binary=all --find-links https://download.pytorch.org/whl/cpu -r requirements.txt || \
+pip install --prefer-binary -r requirements.txt || \
+pip install -r requirements.txt
 
 echo "✅ ML Service build complete!"
