@@ -266,12 +266,18 @@ async def get_model_info():
 
 if __name__ == "__main__":
     import uvicorn
+    import os
+    
+    # Get port from environment
+    port = int(os.environ.get('PORT', 8001))
+    
+    print(f"🚀 Starting EcoMeter ML Service on port {port}")
     
     # Run the FastAPI application
     uvicorn.run(
         "app:app",
         host="0.0.0.0",
-        port=8001,
-        reload=True,
+        port=port,
+        reload=False,
         log_level="info"
     )
