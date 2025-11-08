@@ -6,36 +6,32 @@ import {
   Calendar, 
   TrendingUp, 
   Car,
-  AlertCircle,
-  ChevronLeft,
-  ChevronRight
+  AlertCircle
 } from 'lucide-react';
 import { toast } from 'react-toastify';
 import { predictionAPI } from '../services/api';
+import ConfirmationModal from './ConfirmationModal';
 
 const HistoryList = ({ refreshTrigger }) => {
   const [predictions, setPredictions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [deleting, setDeleting] = useState(null);
-  const [pagination, setPagination] = useState({
-    currentPage: 1,
-    totalPages: 1,
-    totalCount: 0,
-    hasNextPage: false,
-    hasPreviousPage: false,
-    limit: 10
+  const [confirmModal, setConfirmModal] = useState({
+    isOpen: false,
+    predictionId: null,
+    predictionData: null
   });
   
-  // Load predictions
-  const loadPredictions = async (page = 1) => {
+  // Load all predictions
+  const loadPredictions = async () => {
     try {
       setLoading(true);
-      console.log(`📊 Loading predictions page ${page}`);
+      console.log('📊 Loading all predictions');
       
-      const response = await predictionAPI.getHistory(page, pagination.limit);
+      // Fetch all records by using a very large limit
+      const response = await predictionAPI.getHistory(1, 1000);
       
       setPredictions(response.data.predictions);
-      setPagination(response.data.pagination);
       
       console.log(`✅ Loaded ${response.data.predictions.length} predictions`);
       
@@ -48,12 +44,28 @@ const HistoryList = ({ refreshTrigger }) => {
     }
   };
 
-  // Delete prediction
-  const handleDelete = async (id) => {
-    if (!window.confirm('Are you sure you want to delete this prediction?')) {
-      return;
-    }
+  // Show delete confirmation modal
+  const handleDeleteClick = (prediction) => {
+    setConfirmModal({
+      isOpen: true,
+      predictionId: prediction._id,
+      predictionData: prediction
+    });
+  };
 
+  // Close confirmation modal
+  const closeConfirmModal = () => {
+    setConfirmModal({
+      isOpen: false,
+      predictionId: null,
+      predictionData: null
+    });
+  };
+
+  // Confirm delete
+  const confirmDelete = async () => {
+    const id = confirmModal.predictionId;
+    
     try {
       setDeleting(id);
       console.log(`🗑️ Deleting prediction ${id}`);
@@ -65,18 +77,15 @@ const HistoryList = ({ refreshTrigger }) => {
       
       toast.success('Prediction deleted successfully');
       
-      // Refresh if current page becomes empty
-      if (predictions.length === 1 && pagination.currentPage > 1) {
-        loadPredictions(pagination.currentPage - 1);
-      } else {
-        loadPredictions(pagination.currentPage);
-      }
+      // Reload all predictions to show updated list
+      loadPredictions();
       
     } catch (error) {
       console.error('❌ Failed to delete prediction:', error);
       toast.error('Failed to delete prediction');
     } finally {
       setDeleting(null);
+      closeConfirmModal();
     }
   };
 
@@ -101,15 +110,8 @@ const HistoryList = ({ refreshTrigger }) => {
 
   // Load predictions on mount and when refreshTrigger changes
   useEffect(() => {
-    loadPredictions(1);
+    loadPredictions();
   }, [refreshTrigger]);
-
-  // Handle page change
-  const handlePageChange = (newPage) => {
-    if (newPage >= 1 && newPage <= pagination.totalPages) {
-      loadPredictions(newPage);
-    }
-  };
 
   if (loading) {
     return (
@@ -132,14 +134,14 @@ const HistoryList = ({ refreshTrigger }) => {
         </div>
         <div className="flex items-center space-x-2">
           <button
-            onClick={() => loadPredictions(pagination.currentPage)}
+            onClick={() => loadPredictions()}
             className="px-3 py-1 text-sm bg-gray-100 hover:bg-gray-200 rounded transition-colors duration-200"
             disabled={loading}
           >
             <RefreshCw className="w-4 h-4" />
           </button>
           <span className="text-sm text-gray-500">
-            {pagination.totalCount} total predictions
+            {predictions.length} predictions
           </span>
         </div>
       </div>
@@ -155,111 +157,76 @@ const HistoryList = ({ refreshTrigger }) => {
         </div>
       ) : (
         <>
-          {/* Predictions List */}
-          <div className="space-y-3">
-            {predictions.map((prediction) => {
-              const category = getEmissionCategory(prediction.prediction);
-              
-              return (
-                <div
-                  key={prediction._id}
-                  className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow duration-200"
-                >
-                  <div className="flex items-center justify-between">
-                    {/* Prediction Info */}
-                    <div className="flex-1">
-                      <div className="flex items-center space-x-4 mb-2">
-                        {/* CO2 Emission */}
-                        <div className="flex items-center">
-                          <TrendingUp className="w-4 h-4 mr-1 text-gray-500" />
-                          <span className="font-bold text-lg text-gray-800">
-                            {prediction.prediction.toFixed(1)} g CO₂/km
-                          </span>
-                          <span className={`ml-2 px-2 py-1 text-xs font-medium rounded-full ${category.color}`}>
-                            {category.label}
-                          </span>
-                        </div>
-                      </div>
-                      
-                      {/* Car Specifications */}
-                      <div className="grid grid-cols-3 gap-4 text-sm text-gray-600 mb-2">
-                        <div>
-                          <span className="font-medium">Engine:</span> {prediction.engineSize}L
-                        </div>
-                        <div>
-                          <span className="font-medium">Cylinders:</span> {prediction.cylinders}
-                        </div>
-                        <div>
-                          <span className="font-medium">Fuel:</span> {prediction.fuelConsumption}L/100km
-                        </div>
-                      </div>
-                      
-                      {/* Timestamp */}
-                      <div className="flex items-center text-xs text-gray-500">
-                        <Calendar className="w-3 h-3 mr-1" />
-                        {formatDate(prediction.createdAt)}
-                      </div>
-                    </div>
-
-                    {/* Delete Button */}
-                    <button
-                      onClick={() => handleDelete(prediction._id)}
-                      disabled={deleting === prediction._id}
-                      className={`ml-4 p-2 rounded-md transition-colors duration-200 ${
-                        deleting === prediction._id
-                          ? 'bg-gray-100 cursor-not-allowed'
-                          : 'hover:bg-red-50 text-red-600 hover:text-red-700'
-                      }`}
-                      title="Delete prediction"
-                    >
-                      {deleting === prediction._id ? (
-                        <RefreshCw className="w-4 h-4 animate-spin" />
-                      ) : (
-                        <Trash2 className="w-4 h-4" />
-                      )}
-                    </button>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-
-          {/* Pagination */}
-          {pagination.totalPages > 1 && (
-            <div className="flex items-center justify-between mt-6 pt-4 border-t border-gray-200">
-              <div className="text-sm text-gray-600">
-                Page {pagination.currentPage} of {pagination.totalPages}
-              </div>
-              
-              <div className="flex items-center space-x-2">
-                <button
-                  onClick={() => handlePageChange(pagination.currentPage - 1)}
-                  disabled={!pagination.hasPreviousPage}
-                  className={`px-3 py-1 rounded-md flex items-center text-sm ${
-                    pagination.hasPreviousPage
-                      ? 'bg-gray-100 hover:bg-gray-200 text-gray-700'
-                      : 'bg-gray-50 text-gray-400 cursor-not-allowed'
-                  }`}
-                >
-                  <ChevronLeft className="w-4 h-4 mr-1" />
-                  Previous
-                </button>
+          {/* Predictions List - Fixed height with scrolling */}
+          <div className="h-96 overflow-y-auto border border-gray-200 rounded-lg bg-gray-50">
+            <div className="space-y-3 p-3">
+              {predictions.map((prediction) => {
+                const category = getEmissionCategory(prediction.prediction);
                 
-                <button
-                  onClick={() => handlePageChange(pagination.currentPage + 1)}
-                  disabled={!pagination.hasNextPage}
-                  className={`px-3 py-1 rounded-md flex items-center text-sm ${
-                    pagination.hasNextPage
-                      ? 'bg-gray-100 hover:bg-gray-200 text-gray-700'
-                      : 'bg-gray-50 text-gray-400 cursor-not-allowed'
-                  }`}
-                >
-                  Next
-                  <ChevronRight className="w-4 h-4 ml-1" />
-                </button>
-              </div>
+                return (
+                  <div
+                    key={prediction._id}
+                    className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow duration-200 bg-white"
+                  >
+                    <div className="flex items-center justify-between">
+                      {/* Prediction Info */}
+                      <div className="flex-1">
+                        <div className="flex items-center space-x-4 mb-2">
+                          {/* CO2 Emission */}
+                          <div className="flex items-center">
+                            <TrendingUp className="w-4 h-4 mr-1 text-gray-500" />
+                            <span className="font-bold text-lg text-gray-800">
+                              {prediction.prediction.toFixed(1)} g CO₂/km
+                            </span>
+                            <span className={`ml-2 px-2 py-1 text-xs font-medium rounded-full ${category.color}`}>
+                              {category.label}
+                            </span>
+                          </div>
+                        </div>
+                        
+                        {/* Car Specifications */}
+                        <div className="grid grid-cols-3 gap-4 text-sm text-gray-600 mb-2">
+                          <div>
+                            <span className="font-medium">Engine:</span> {prediction.engineSize}L
+                          </div>
+                          <div>
+                            <span className="font-medium">Cylinders:</span> {prediction.cylinders}
+                          </div>
+                          <div>
+                            <span className="font-medium">Fuel:</span> {prediction.fuelConsumption}L/100km
+                          </div>
+                        </div>
+                        
+                        {/* Timestamp */}
+                        <div className="flex items-center text-xs text-gray-500">
+                          <Calendar className="w-3 h-3 mr-1" />
+                          {formatDate(prediction.createdAt)}
+                        </div>
+                      </div>
+
+                      {/* Delete Button */}
+                      <button
+                        onClick={() => handleDeleteClick(prediction)}
+                        disabled={deleting === prediction._id}
+                        className={`ml-4 p-2 rounded-md transition-colors duration-200 ${
+                          deleting === prediction._id
+                            ? 'bg-gray-100 cursor-not-allowed'
+                            : 'hover:bg-red-50 text-red-600 hover:text-red-700'
+                        }`}
+                        title="Delete prediction"
+                      >
+                        {deleting === prediction._id ? (
+                          <RefreshCw className="w-4 h-4 animate-spin" />
+                        ) : (
+                          <Trash2 className="w-4 h-4" />
+                        )}
+                      </button>
+                    </div>
+                  </div>
+                );
+              })}
             </div>
-          )}
+          </div>
         </>
       )}
 
@@ -273,6 +240,22 @@ const HistoryList = ({ refreshTrigger }) => {
           </p>
         </div>
       </div>
+
+      {/* Confirmation Modal */}
+      <ConfirmationModal
+        isOpen={confirmModal.isOpen}
+        onClose={closeConfirmModal}
+        onConfirm={confirmDelete}
+        title="Delete Prediction"
+        message={
+          confirmModal.predictionData 
+            ? `Are you sure you want to delete this prediction? This will permanently remove the CO₂ emission prediction of ${confirmModal.predictionData.prediction.toFixed(1)} g CO₂/km from your history.`
+            : "Are you sure you want to delete this prediction?"
+        }
+        confirmText="Delete"
+        cancelText="Cancel"
+        type="danger"
+      />
     </div>
   );
 };

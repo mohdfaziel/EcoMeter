@@ -115,31 +115,7 @@ const PredictionForm = ({ onPredictionComplete }) => {
     }
   };
 
-  // Quick fill buttons for common car types
-  const quickFillOptions = [
-    { 
-      name: 'Compact Car', 
-      data: { engineSize: '1.8', cylinders: '4', fuelConsumption: '7.5' } 
-    },
-    { 
-      name: 'Sedan', 
-      data: { engineSize: '2.5', cylinders: '4', fuelConsumption: '9.0' } 
-    },
-    { 
-      name: 'SUV', 
-      data: { engineSize: '3.5', cylinders: '6', fuelConsumption: '11.5' } 
-    },
-    { 
-      name: 'Pickup Truck', 
-      data: { engineSize: '5.0', cylinders: '8', fuelConsumption: '14.0' } 
-    }
-  ];
 
-  const handleQuickFill = (option) => {
-    setFormData(option.data);
-    setErrors({});
-    toast.info(`Pre-filled with ${option.name} values`);
-  };
 
   return (
     <div className="bg-white rounded-lg shadow-lg p-6 max-w-md mx-auto">
@@ -149,26 +125,6 @@ const PredictionForm = ({ onPredictionComplete }) => {
         <p className="text-gray-600 text-sm">
           Enter your car's specifications to predict CO₂ emissions
         </p>
-      </div>
-
-      {/* Quick Fill Options */}
-      <div className="mb-6">
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          Quick Fill (Common Car Types):
-        </label>
-        <div className="grid grid-cols-2 gap-2">
-          {quickFillOptions.map((option, index) => (
-            <button
-              key={index}
-              type="button"
-              onClick={() => handleQuickFill(option)}
-              className="px-3 py-2 text-xs bg-gray-100 hover:bg-gray-200 rounded transition-colors duration-200"
-              disabled={loading}
-            >
-              {option.name}
-            </button>
-          ))}
-        </div>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-4">
