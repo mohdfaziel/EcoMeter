@@ -58,10 +58,6 @@ GET /api/history?page=1&limit=20
 - **Dataset:** Government of Canada Fuel Consumption (1,067 records)
 - **Features:** Engine Size, Cylinders, Fuel Consumption
 
-## License
-
-MIT License - see [LICENSE](LICENSE) for details.
-
 ## Contributing
 
 1. Fork the repository
