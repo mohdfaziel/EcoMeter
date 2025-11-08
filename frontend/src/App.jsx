@@ -8,7 +8,8 @@ import {
   ExternalLink,
   Github,
   Database,
-  Zap
+  Zap,
+  X
 } from 'lucide-react';
 
 import PredictionForm from './components/PredictionForm';
@@ -19,6 +20,7 @@ function App() {
   const [refreshHistoryTrigger, setRefreshHistoryTrigger] = useState(0);
   const [backendStatus, setBackendStatus] = useState('checking');
   const [lastPrediction, setLastPrediction] = useState(null);
+  const [showStatusTooltip, setShowStatusTooltip] = useState(false);
 
   // Check backend health on mount
   useEffect(() => {
@@ -43,31 +45,59 @@ function App() {
     setRefreshHistoryTrigger(prev => prev + 1); // Trigger history refresh
   };
 
-  // Get status indicator
+  // Get status indicator with custom tooltip
   const getStatusIndicator = () => {
-    switch (backendStatus) {
-      case 'healthy':
-        return (
-          <div className="flex items-center text-green-600 text-sm">
-            <CheckCircle className="w-4 h-4 mr-1" />
-            All systems operational
+    const getStatusConfig = () => {
+      switch (backendStatus) {
+        case 'healthy':
+          return {
+            icon: <CheckCircle className="w-5 h-5" />,
+            text: "All systems operational",
+            iconColor: "text-green-400",
+            tooltipBg: "bg-green-600",
+            tooltipText: "text-white"
+          };
+        case 'unhealthy':
+          return {
+            icon: <X className="w-5 h-5" />,
+            text: "Service unavailable",
+            iconColor: "text-red-400",
+            tooltipBg: "bg-red-600",
+            tooltipText: "text-white"
+          };
+        default:
+          return {
+            icon: <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-yellow-400"></div>,
+            text: "Checking status...",
+            iconColor: "text-yellow-400",
+            tooltipBg: "bg-yellow-600",
+            tooltipText: "text-white"
+          };
+      }
+    };
+
+    const config = getStatusConfig();
+
+    return (
+      <div 
+        className="relative flex items-center cursor-pointer"
+        onMouseEnter={() => setShowStatusTooltip(true)}
+        onMouseLeave={() => setShowStatusTooltip(false)}
+      >
+        <div className={`flex items-center ${config.iconColor}`}>
+          {config.icon}
+        </div>
+        
+        {/* Custom Tooltip */}
+        {showStatusTooltip && (
+          <div className={`absolute top-full left-1/2 transform -translate-x-1/2 mt-2 px-3 py-2 text-sm ${config.tooltipBg} ${config.tooltipText} rounded-lg shadow-lg whitespace-nowrap z-50 backdrop-blur-sm`}>
+            {config.text}
+            {/* Arrow pointing up */}
+            <div className={`absolute bottom-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-b-4 border-transparent ${config.tooltipBg.replace('bg-', 'border-b-')}`}></div>
           </div>
-        );
-      case 'unhealthy':
-        return (
-          <div className="flex items-center text-red-600 text-sm">
-            <AlertTriangle className="w-4 h-4 mr-1" />
-            Service unavailable
-          </div>
-        );
-      default:
-        return (
-          <div className="flex items-center text-yellow-600 text-sm">
-            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-yellow-600 mr-2"></div>
-            Checking status...
-          </div>
-        );
-    }
+        )}
+      </div>
+    );
   };
 
   return (
@@ -86,14 +116,8 @@ function App() {
               </div>
             </div>
             
-            <div className="flex items-center space-x-4">
+            <div className="flex items-center">
               {getStatusIndicator()}
-              <button
-                onClick={checkBackendHealth}
-                className="px-3 py-1 text-sm bg-white/20 hover:bg-white/30 text-white rounded transition-colors duration-200"
-              >
-                Refresh Status
-              </button>
             </div>
           </div>
         </div>
@@ -166,35 +190,6 @@ function App() {
             <p className="text-blue-100 text-sm">
               Make informed decisions about your vehicle's environmental footprint.
             </p>
-          </div>
-        </div>
-
-        {/* Technical Info */}
-        <div className="mt-16 bg-white/5 backdrop-blur-md rounded-lg p-8">
-          <h3 className="text-xl font-semibold text-white mb-4 text-center">How It Works</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 text-blue-100">
-            <div>
-              <h4 className="font-semibold text-white mb-2">Machine Learning Model</h4>
-              <p className="text-sm mb-3">
-                Our prediction model is trained on real car data using Linear Regression with feature scaling. 
-                The model considers three key factors:
-              </p>
-              <ul className="text-sm space-y-1 list-disc list-inside ml-4">
-                <li>Engine Size (in liters)</li>
-                <li>Number of Cylinders</li>
-                <li>Combined Fuel Consumption (L/100km)</li>
-              </ul>
-            </div>
-            
-            <div>
-              <h4 className="font-semibold text-white mb-2">Technology Stack</h4>
-              <div className="text-sm space-y-1">
-                <p><strong>Frontend:</strong> React + Vite</p>
-                <p><strong>Backend:</strong> Express.js + MongoDB</p>
-                <p><strong>ML Service:</strong> FastAPI + scikit-learn</p>
-                <p><strong>Model:</strong> Linear Regression Pipeline</p>
-              </div>
-            </div>
           </div>
         </div>
       </main>
