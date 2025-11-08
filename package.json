@@ -1,0 +1,22 @@
+{
+  "name": "ecometer-root",
+  "version": "1.0.0",
+  "description": "Car CO2 Emissions Predictor - Root Scripts",
+  "scripts": {
+    "start": "concurrently \"npm run start:ml\" \"npm run start:backend\" \"npm run start:frontend\"",
+    "start:ml": "cd ml-service && python -m uvicorn app:app --host 127.0.0.1 --port 8001",
+    "start:backend": "cd backend && node index.js", 
+    "start:frontend": "cd frontend && npm run dev",
+    "train": "cd training && python train.py",
+    "setup": "npm run train && npm run install:all",
+    "install:all": "npm run install:backend && npm run install:frontend",
+    "install:backend": "cd backend && npm install",
+    "install:frontend": "cd frontend && npm install"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  },
+  "keywords": ["car", "co2", "emissions", "ml", "mern"],
+  "author": "EcoMeter Team",
+  "license": "MIT"
+}
