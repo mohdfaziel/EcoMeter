@@ -115,8 +115,8 @@ const HistoryList = ({ refreshTrigger }) => {
 
   if (loading) {
     return (
-      <div className="bg-white rounded-lg shadow-lg p-6">
-        <div className="flex items-center justify-center py-8">
+      <div className="bg-white rounded-lg shadow-lg p-6 h-[600px] flex flex-col">
+        <div className="flex items-center justify-center flex-1">
           <RefreshCw className="animate-spin mr-2" size={20} />
           <span>Loading prediction history...</span>
         </div>
@@ -125,7 +125,7 @@ const HistoryList = ({ refreshTrigger }) => {
   }
 
   return (
-    <div className="bg-white rounded-lg shadow-lg p-6">
+    <div className="bg-white rounded-lg shadow-lg p-6 h-[600px] flex flex-col">
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center">
@@ -158,7 +158,7 @@ const HistoryList = ({ refreshTrigger }) => {
       ) : (
         <>
           {/* Predictions List - Fixed height with scrolling */}
-          <div className="h-96 overflow-y-auto border border-gray-200 rounded-lg bg-gray-50">
+          <div className="flex-1 overflow-y-auto border border-gray-200 rounded-lg bg-gray-50">
             <div className="space-y-3 p-3">
               {predictions.map((prediction) => {
                 const category = getEmissionCategory(prediction.prediction);

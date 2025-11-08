@@ -118,7 +118,7 @@ const PredictionForm = ({ onPredictionComplete }) => {
 
 
   return (
-    <div className="bg-white rounded-lg shadow-lg p-6 max-w-md mx-auto">
+    <div className="bg-white rounded-lg shadow-lg p-6 max-w-md mx-auto h-[600px] flex flex-col">
       <div className="text-center mb-6">
         <Car className="mx-auto mb-3 text-blue-600" size={48} />
         <h2 className="text-2xl font-bold text-gray-800 mb-2">CO₂ Prediction</h2>
@@ -127,7 +127,8 @@ const PredictionForm = ({ onPredictionComplete }) => {
         </p>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form onSubmit={handleSubmit} className="flex-1 flex flex-col">
+        <div className="space-y-4 flex-1">
         {/* Engine Size */}
         <div>
           <label htmlFor="engineSize" className="block text-sm font-medium text-gray-700 mb-1">
@@ -218,11 +219,13 @@ const PredictionForm = ({ onPredictionComplete }) => {
           </p>
         </div>
 
+        </div>
+        
         {/* Submit Button */}
         <button
           type="submit"
           disabled={loading}
-          className={`w-full py-3 px-4 rounded-md font-medium transition-all duration-200 ${
+          className={`w-full py-3 px-4 rounded-md font-medium transition-all duration-200 mt-6 ${
             loading
               ? 'bg-gray-400 cursor-not-allowed'
               : 'bg-blue-600 hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2'
