@@ -132,7 +132,7 @@ const HistoryList = ({ refreshTrigger }) => {
           <History className="mr-2 text-gray-600" size={24} />
           <h2 className="text-xl font-bold text-gray-800">Prediction History</h2>
         </div>
-        <div className="flex items-center space-x-2">
+        <div className="hidden md:flex items-center space-x-2">
           <button
             onClick={() => loadPredictions()}
             className="px-3 py-1 text-sm bg-gray-100 hover:bg-gray-200 rounded transition-colors duration-200"
@@ -230,16 +230,6 @@ const HistoryList = ({ refreshTrigger }) => {
         </>
       )}
 
-      {/* Info Footer */}
-      <div className="mt-6 pt-4 border-t border-gray-200">
-        <div className="flex items-start space-x-2 text-xs text-gray-500">
-          <AlertCircle className="w-4 h-4 mt-0.5 flex-shrink-0" />
-          <p>
-            Predictions are stored locally and will persist between sessions. 
-            Delete individual predictions using the trash icon.
-          </p>
-        </div>
-      </div>
 
       {/* Confirmation Modal */}
       <ConfirmationModal

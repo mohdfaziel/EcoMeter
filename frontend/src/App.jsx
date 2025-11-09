@@ -9,7 +9,8 @@ import {
   Github,
   Database,
   Zap,
-  X
+  X,
+  User
 } from 'lucide-react';
 
 import PredictionForm from './components/PredictionForm';
@@ -127,10 +128,10 @@ function App() {
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Hero Section */}
         <div className="text-center mb-12">
-          <h2 className="text-4xl font-bold text-white mb-4">
+          <h2 className="text-2xl md:text-4xl font-bold text-white mb-4">
             Predict Your Car's CO₂ Emissions
           </h2>
-          <p className="text-xl text-blue-100 max-w-3xl mx-auto">
+          <p className="text-lg md:text-xl text-blue-100 max-w-3xl mx-auto">
            This prediction is based on a machine learning model trained on real car data. 
           Results are estimates and may vary from actual emissions.
           </p>
@@ -141,7 +142,7 @@ function App() {
           <div className="mb-8">
             <div className="bg-green-500/20 backdrop-blur-md border border-green-500/30 rounded-lg p-6 text-center">
               <h3 className="text-lg font-semibold text-white mb-2">Latest Prediction</h3>
-              <div className="text-3xl font-bold text-green-300 mb-2">
+              <div className="text-2xl md:text-3xl font-bold text-green-300 mb-2">
                 {lastPrediction.formattedPrediction}
               </div>
               <p className="text-green-100 text-sm">
@@ -197,29 +198,30 @@ function App() {
       {/* Footer */}
       <footer className="bg-white/5 backdrop-blur-md border-t border-white/20 mt-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="flex items-center justify-between">
-            <div className="text-blue-100">
-              <p className="text-sm">
-                © 2024 EcoMeter. Built with React, Express.js, and Machine Learning.
+          <div className="flex flex-col md:flex-row items-center justify-between space-y-4 md:space-y-0">
+            {/* Left side - Copyright and Description */}
+            <div className="text-center md:text-left">
+              <div className="flex items-center justify-center md:justify-start space-x-2 mb-2">
+                <div className="p-1 bg-green-500 rounded">
+                  <Leaf className="w-4 h-4 text-white" />
+                </div>
+                <span className="text-white font-semibold">EcoMeter</span>
+              </div>
+              <p className="text-sm text-blue-100">
+                © 2025 EcoMeter. Helping you understand your vehicle's environmental impact.
               </p>
             </div>
             
-            <div className="flex items-center space-x-4">
+            {/* Right side - Portfolio Link */}
+            <div className="flex items-center">
               <a
-                href="https://github.com"
+                href="https://faziel.vercel.app/"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-blue-100 hover:text-white transition-colors duration-200"
-                title="View on GitHub"
+                className="text-blue-100 hover:text-white transition-colors duration-200 p-2 hover:bg-white/10 rounded-lg"
+                title="Developer Portfolio"
               >
-                <Github className="w-5 h-5" />
-              </a>
-              <a
-                href="#"
-                className="text-blue-100 hover:text-white transition-colors duration-200"
-                title="Documentation"
-              >
-                <ExternalLink className="w-5 h-5" />
+                <User className="w-5 h-5" />
               </a>
             </div>
           </div>
