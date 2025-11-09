@@ -4,7 +4,7 @@
   "description": "Car CO2 Emissions Predictor - Root Scripts",
   "scripts": {
     "start": "concurrently \"npm run start:ml\" \"npm run start:backend\" \"npm run start:frontend\"",
-    "start:ml": "cd ml-service && python run_local.py",
+    "start:ml": "cd ml-service && set PYTHONIOENCODING=utf-8 && python run_local.py",
     "start:backend": "cd backend && node index.js", 
     "start:frontend": "cd frontend && npm run dev",
     "train": "cd training && python train.py",
