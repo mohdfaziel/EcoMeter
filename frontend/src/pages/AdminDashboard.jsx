@@ -121,12 +121,6 @@ const AdminLogin = ({ onLogin }) => {
             )}
           </button>
         </form>
-
-        <div className="mt-6 p-4 bg-blue-500/20 border border-blue-500/30 rounded-lg">
-          <p className="text-sm text-blue-100 mb-2">Demo Credentials:</p>
-          <p className="text-xs text-blue-200">Email: admin@ecometer.com</p>
-          <p className="text-xs text-blue-200">Password: admin123</p>
-        </div>
       </div>
     </div>
   );

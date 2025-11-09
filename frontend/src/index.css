@@ -58,18 +58,40 @@ code {
 }
 
 .Toastify__toast--success {
-  background: #10b981;
+  background: #059669 !important;
+  color: white !important;
 }
 
 .Toastify__toast--error {
-  background: #ef4444;
+  background: #dc2626 !important;
+  color: white !important;
 }
 
 .Toastify__toast--info {
-  background: #3b82f6;
+  background: #2563eb !important;
+  color: white !important;
 }
 
 .Toastify__toast--warning {
-  background: #f59e0b;
+  background: #d97706 !important;
+  color: white !important;
+}
+
+/* Ensure all toast text elements are white */
+.Toastify__toast--success .Toastify__toast-body,
+.Toastify__toast--error .Toastify__toast-body,
+.Toastify__toast--info .Toastify__toast-body,
+.Toastify__toast--warning .Toastify__toast-body {
+  color: white !important;
+}
+
+/* Close button styling */
+.Toastify__close-button {
+  color: white !important;
+  opacity: 0.8;
+}
+
+.Toastify__close-button:hover {
+  opacity: 1;
 }
 
