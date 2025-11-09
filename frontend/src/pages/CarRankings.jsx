@@ -355,9 +355,9 @@ const CarRankings = () => {
             <h2 className="text-lg font-semibold text-white">Filters & Search</h2>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-6 gap-4">
-            {/* Search */}
-            <div className="lg:col-span-2">
+          <div className="space-y-4">
+            {/* Search - Full Width */}
+            <div>
               <label className="block text-sm text-blue-100 mb-1">Search</label>
               <div className="relative">
                 <input
@@ -372,71 +372,74 @@ const CarRankings = () => {
               </div>
             </div>
 
-            {/* Fuel Type */}
-            <div>
-              <label className="block text-sm text-blue-100 mb-1">Fuel Type</label>
-              <select
-                value={filters.fuelType}
-                onChange={(e) => handleFilterChange('fuelType', e.target.value)}
-                className="w-full p-2 bg-white/20 border border-white/30 rounded-lg text-white focus:outline-none focus:border-blue-400 [&>option]:bg-gray-800 [&>option]:text-white"
-              >
-                <option value="all" className="bg-gray-800 text-white">All Types</option>
-                {availableFilters.fuelTypes.map(type => (
-                  <option key={type} value={type} className="bg-gray-800 text-white">{type}</option>
-                ))}
-              </select>
-            </div>
+            {/* Filter Controls Grid */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              {/* Fuel Type */}
+              <div>
+                <label className="block text-sm text-blue-100 mb-1">Fuel Type</label>
+                <select
+                  value={filters.fuelType}
+                  onChange={(e) => handleFilterChange('fuelType', e.target.value)}
+                  className="w-full p-2 bg-white/20 border border-white/30 rounded-lg text-white focus:outline-none focus:border-blue-400 [&>option]:bg-gray-800 [&>option]:text-white"
+                >
+                  <option value="all" className="bg-gray-800 text-white">All Types</option>
+                  {availableFilters.fuelTypes.map(type => (
+                    <option key={type} value={type} className="bg-gray-800 text-white">{type}</option>
+                  ))}
+                </select>
+              </div>
 
-            {/* Make */}
-            <div>
-              <label className="block text-sm text-blue-100 mb-1">Make</label>
-              <select
-                value={filters.make}
-                onChange={(e) => handleFilterChange('make', e.target.value)}
-                className="w-full p-2 bg-white/20 border border-white/30 rounded-lg text-white focus:outline-none focus:border-blue-400 [&>option]:bg-gray-800 [&>option]:text-white"
-              >
-                <option value="all" className="bg-gray-800 text-white">All Makes</option>
-                {availableFilters.makes.map(make => (
-                  <option key={make} value={make} className="bg-gray-800 text-white">{make}</option>
-                ))}
-              </select>
-            </div>
+              {/* Make */}
+              <div>
+                <label className="block text-sm text-blue-100 mb-1">Make</label>
+                <select
+                  value={filters.make}
+                  onChange={(e) => handleFilterChange('make', e.target.value)}
+                  className="w-full p-2 bg-white/20 border border-white/30 rounded-lg text-white focus:outline-none focus:border-blue-400 [&>option]:bg-gray-800 [&>option]:text-white"
+                >
+                  <option value="all" className="bg-gray-800 text-white">All Makes</option>
+                  {availableFilters.makes.map(make => (
+                    <option key={make} value={make} className="bg-gray-800 text-white">{make}</option>
+                  ))}
+                </select>
+              </div>
 
-            {/* Sort By */}
-            <div>
-              <label className="block text-sm text-blue-100 mb-1">Sort By</label>
-              <select
-                value={filters.sortBy}
-                onChange={(e) => handleFilterChange('sortBy', e.target.value)}
-                className="w-full p-2 bg-white/20 border border-white/30 rounded-lg text-white focus:outline-none focus:border-blue-400 [&>option]:bg-gray-800 [&>option]:text-white"
-              >
-                <option value="score" className="bg-gray-800 text-white">Rank (Score)</option>
-                <option value="co2_gkm" className="bg-gray-800 text-white">CO₂ Emissions</option>
-                <option value="price_lakh" className="bg-gray-800 text-white">Price</option>
-                <option value="mileage_kmpl" className="bg-gray-800 text-white">Mileage</option>
-                <option value="comfort_rating" className="bg-gray-800 text-white">Comfort</option>
-                <option value="space_rating" className="bg-gray-800 text-white">Space</option>
-              </select>
-            </div>
+              {/* Sort By */}
+              <div>
+                <label className="block text-sm text-blue-100 mb-1">Sort By</label>
+                <select
+                  value={filters.sortBy}
+                  onChange={(e) => handleFilterChange('sortBy', e.target.value)}
+                  className="w-full p-2 bg-white/20 border border-white/30 rounded-lg text-white focus:outline-none focus:border-blue-400 [&>option]:bg-gray-800 [&>option]:text-white"
+                >
+                  <option value="score" className="bg-gray-800 text-white">Rank (Score)</option>
+                  <option value="co2_gkm" className="bg-gray-800 text-white">CO₂ Emissions</option>
+                  <option value="price_lakh" className="bg-gray-800 text-white">Price</option>
+                  <option value="mileage_kmpl" className="bg-gray-800 text-white">Mileage</option>
+                  <option value="comfort_rating" className="bg-gray-800 text-white">Comfort</option>
+                  <option value="space_rating" className="bg-gray-800 text-white">Space</option>
+                </select>
+              </div>
 
-            {/* Sort Order */}
-            <div>
-              <label className="block text-sm text-blue-100 mb-1">Order</label>
-              <button
-                onClick={() => handleFilterChange('sortOrder', filters.sortOrder === 'desc' ? 'asc' : 'desc')}
-                className="w-full p-2 bg-white/20 border border-white/30 rounded-lg text-white flex items-center justify-center hover:bg-white/30 transition-colors"
-              >
-                {filters.sortOrder === 'desc' ? (
-                  <><SortDesc className="w-4 h-4 mr-2" /> High to Low</>
-                ) : (
-                  <><SortAsc className="w-4 h-4 mr-2" /> Low to High</>
-                )}
-              </button>
+              {/* Sort Order */}
+              <div>
+                <label className="block text-sm text-blue-100 mb-1">Order</label>
+                <button
+                  onClick={() => handleFilterChange('sortOrder', filters.sortOrder === 'desc' ? 'asc' : 'desc')}
+                  className="w-full p-2 bg-white/20 border border-white/30 rounded-lg text-white flex items-center justify-center hover:bg-white/30 transition-colors"
+                >
+                  {filters.sortOrder === 'desc' ? (
+                    <><SortDesc className="w-4 h-4 mr-1 sm:mr-2" /> <span className="hidden sm:inline">High to Low</span><span className="sm:hidden">↓</span></>
+                  ) : (
+                    <><SortAsc className="w-4 h-4 mr-1 sm:mr-2" /> <span className="hidden sm:inline">Low to High</span><span className="sm:hidden">↑</span></>
+                  )}
+                </button>
+              </div>
             </div>
           </div>
 
           {/* Price Range */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-4">
             <div>
               <label className="block text-sm text-blue-100 mb-1">Min Price (₹ Lakh)</label>
               <input
@@ -459,7 +462,7 @@ const CarRankings = () => {
               />
             </div>
             
-            <div className="flex items-end">
+            <div className="sm:col-span-2 lg:col-span-1 flex items-end">
               <button
                 onClick={resetFilters}
                 className="w-full p-2 bg-red-500/20 hover:bg-red-500/30 border border-red-500/30 rounded-lg text-white transition-colors"
@@ -471,9 +474,9 @@ const CarRankings = () => {
         </div>
 
         {/* Main Content Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
           {/* Car Rankings Table */}
-          <div className="lg:col-span-2">
+          <div className="xl:col-span-2">
             <div className="bg-white/10 backdrop-blur-md rounded-lg overflow-hidden">
               <div className="p-6 border-b border-white/20">
                 <h2 className="text-xl font-semibold text-white flex items-center">
@@ -501,7 +504,77 @@ const CarRankings = () => {
                 <div className="divide-y divide-white/10">
                   {cars.map((car) => (
                     <div key={car._id} className="p-4 hover:bg-white/5 transition-colors">
-                      <div className="flex items-center space-x-4">
+                      {/* Mobile Layout */}
+                      <div className="block sm:hidden">
+                        <div className="flex items-start space-x-3 mb-3">
+                          <div className="flex-shrink-0">
+                            {getRankIcon(car.rank)}
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <h3 className="text-lg font-semibold text-white mb-1">
+                              {car.make} {car.model}
+                            </h3>
+                            <div className={`inline-flex px-2 py-1 rounded-full border text-xs font-medium ${getScoreBgColor(car.score)}`}>
+                              <span className={getScoreColor(car.score)}>
+                                Score: {car.score}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                        
+                        {/* Mobile Stats Grid */}
+                        <div className="grid grid-cols-2 gap-3 text-sm mb-3">
+                          <div className="bg-white/5 rounded-lg p-3">
+                            <div className="flex items-center text-blue-100 mb-1">
+                              <DollarSign className="w-4 h-4 mr-1" />
+                              <span className="font-medium">Price</span>
+                            </div>
+                            <div className="text-white font-semibold">₹{car.price_lakh}L</div>
+                          </div>
+                          
+                          <div className="bg-white/5 rounded-lg p-3">
+                            <div className="flex items-center text-blue-100 mb-1">
+                              <Gauge className="w-4 h-4 mr-1" />
+                              <span className="font-medium">Mileage</span>
+                            </div>
+                            <div className="text-white font-semibold">{car.mileage_kmpl} km/l</div>
+                          </div>
+                          
+                          <div className="bg-white/5 rounded-lg p-3">
+                            <div className="flex items-center text-blue-100 mb-1">
+                              <Zap className="w-4 h-4 mr-1" />
+                              <span className="font-medium">CO₂</span>
+                            </div>
+                            <div className="text-white font-semibold">{car.co2_gkm} g/km</div>
+                          </div>
+                          
+                          <div className="bg-white/5 rounded-lg p-3">
+                            <div className="flex items-center text-blue-100 mb-1">
+                              <Heart className="w-4 h-4 mr-1" />
+                              <span className="font-medium">Comfort</span>
+                            </div>
+                            <div className="text-white font-semibold">{car.comfort_rating}/10</div>
+                          </div>
+                        </div>
+                        
+                        {/* Additional Info */}
+                        <div className="flex items-center justify-between text-xs text-blue-200 pt-2 border-t border-white/10">
+                          <div className="flex items-center">
+                            <Fuel className="w-3 h-3 mr-1" />
+                            {car.fuel_type}
+                          </div>
+                          <div className="flex items-center">
+                            <Home className="w-3 h-3 mr-1" />
+                            Space {car.space_rating}/10
+                          </div>
+                          <div>
+                            Engine: {car.engine_size_l}L
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Desktop Layout */}
+                      <div className="hidden sm:flex items-center space-x-4">
                         {/* Rank */}
                         <div className="flex-shrink-0 w-12 flex justify-center">
                           {getRankIcon(car.rank)}

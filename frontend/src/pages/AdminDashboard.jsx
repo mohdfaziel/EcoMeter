@@ -197,8 +197,8 @@ const CarForm = ({ car, onSave, onCancel }) => {
   };
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-      <div className="bg-white/10 backdrop-blur-md rounded-lg p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-2 sm:p-4 z-50">
+      <div className="bg-white/10 backdrop-blur-md rounded-lg p-4 sm:p-6 w-full max-w-2xl max-h-[95vh] sm:max-h-[90vh] overflow-y-auto">
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-xl font-semibold text-white flex items-center">
             {car ? <Edit3 className="w-6 h-6 mr-2" /> : <Plus className="w-6 h-6 mr-2" />}
@@ -213,7 +213,7 @@ const CarForm = ({ car, onSave, onCancel }) => {
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm text-blue-100 mb-1">Make</label>
               <input
@@ -342,7 +342,7 @@ const CarForm = ({ car, onSave, onCancel }) => {
             </select>
           </div>
 
-          <div className="flex space-x-4 pt-4">
+          <div className="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-4 pt-4">
             <button
               type="submit"
               disabled={loading}
@@ -792,80 +792,83 @@ const AdminDashboard = () => {
     <div className="min-h-screen bg-gradient-to-br from-blue-600 via-purple-600 to-blue-800 p-4">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="bg-white/10 backdrop-blur-md rounded-lg p-6 mb-8">
-          <div className="flex items-center justify-between">
+        <div className="bg-white/10 backdrop-blur-md rounded-lg p-4 sm:p-6 mb-8">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between space-y-4 sm:space-y-0">
             <div className="flex items-center">
               <Shield className="w-8 h-8 text-blue-300 mr-3" />
               <div>
-                <h1 className="text-2xl font-bold text-white">Admin Dashboard</h1>
-                <p className="text-blue-100">Manage car database</p>
+                <h1 className="text-xl sm:text-2xl font-bold text-white">Admin Dashboard</h1>
+                <p className="text-blue-100 text-sm sm:text-base">Manage car database</p>
               </div>
             </div>
             
-            <div className="flex items-center space-x-4">
-              <div className="flex items-center text-blue-100">
+            <div className="flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-4">
+              <div className="flex items-center justify-center sm:justify-start text-blue-100 bg-white/5 rounded-lg px-3 py-2">
                 <Database className="w-5 h-5 mr-2" />
                 <span>{cars.length} cars</span>
               </div>
-              <button
-                onClick={() => setShowSettings(true)}
-                className="px-4 py-2 bg-blue-500/20 hover:bg-blue-500/30 border border-blue-500/30 rounded-lg text-white transition-colors flex items-center"
-              >
-                <Lock className="w-4 h-4 mr-2" />
-                Reset
-              </button>
-              <button
-                onClick={handleLogout}
-                className="px-4 py-2 bg-red-500/20 hover:bg-red-500/30 border border-red-500/30 rounded-lg text-white transition-colors"
-              >
-                Logout
-              </button>
+              <div className="flex space-x-2">
+                <button
+                  onClick={() => setShowSettings(true)}
+                  className="flex-1 sm:flex-none px-3 sm:px-4 py-2 bg-blue-500/20 hover:bg-blue-500/30 border border-blue-500/30 rounded-lg text-white transition-colors flex items-center justify-center"
+                >
+                  <Lock className="w-4 h-4 mr-1 sm:mr-2" />
+                  <span className="hidden sm:inline">Reset</span>
+                </button>
+                <button
+                  onClick={handleLogout}
+                  className="flex-1 sm:flex-none px-3 sm:px-4 py-2 bg-red-500/20 hover:bg-red-500/30 border border-red-500/30 rounded-lg text-white transition-colors flex items-center justify-center"
+                >
+                  <span className="hidden sm:inline">Logout</span>
+                  <span className="sm:hidden">Logout</span>
+                </button>
+              </div>
             </div>
           </div>
         </div>
 
         {/* Statistics Summary */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <div className="bg-white/10 backdrop-blur-md rounded-lg p-6">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 mb-8">
+          <div className="bg-white/10 backdrop-blur-md rounded-lg p-3 sm:p-6">
             <div className="flex items-center">
-              <Car className="w-8 h-8 text-blue-300 mr-3" />
+              <Car className="w-6 sm:w-8 h-6 sm:h-8 text-blue-300 mr-2 sm:mr-3" />
               <div>
-                <p className="text-sm text-blue-200">Total Cars</p>
-                <p className="text-2xl font-bold text-white">{cars.length}</p>
+                <p className="text-xs sm:text-sm text-blue-200">Total Cars</p>
+                <p className="text-lg sm:text-2xl font-bold text-white">{cars.length}</p>
               </div>
             </div>
           </div>
           
-          <div className="bg-white/10 backdrop-blur-md rounded-lg p-6">
+          <div className="bg-white/10 backdrop-blur-md rounded-lg p-3 sm:p-6">
             <div className="flex items-center">
-              <Fuel className="w-8 h-8 text-green-300 mr-3" />
+              <Fuel className="w-6 sm:w-8 h-6 sm:h-8 text-green-300 mr-2 sm:mr-3" />
               <div>
-                <p className="text-sm text-blue-200">Avg Mileage</p>
-                <p className="text-2xl font-bold text-white">
+                <p className="text-xs sm:text-sm text-blue-200">Avg Mileage</p>
+                <p className="text-lg sm:text-2xl font-bold text-white">
                   {cars.length > 0 ? (cars.reduce((sum, car) => sum + car.mileage_kmpl, 0) / cars.length).toFixed(1) : '0'} km/l
                 </p>
               </div>
             </div>
           </div>
           
-          <div className="bg-white/10 backdrop-blur-md rounded-lg p-6">
+          <div className="bg-white/10 backdrop-blur-md rounded-lg p-3 sm:p-6">
             <div className="flex items-center">
-              <TrendingUp className="w-8 h-8 text-yellow-300 mr-3" />
+              <TrendingUp className="w-6 sm:w-8 h-6 sm:h-8 text-yellow-300 mr-2 sm:mr-3" />
               <div>
-                <p className="text-sm text-blue-200">Avg Score</p>
-                <p className="text-2xl font-bold text-white">
+                <p className="text-xs sm:text-sm text-blue-200">Avg Score</p>
+                <p className="text-lg sm:text-2xl font-bold text-white">
                   {cars.length > 0 ? (cars.reduce((sum, car) => sum + (car.score || 0), 0) / cars.length).toFixed(1) : '0'}
                 </p>
               </div>
             </div>
           </div>
           
-          <div className="bg-white/10 backdrop-blur-md rounded-lg p-6">
+          <div className="bg-white/10 backdrop-blur-md rounded-lg p-3 sm:p-6">
             <div className="flex items-center">
-              <DollarSign className="w-8 h-8 text-red-300 mr-3" />
+              <DollarSign className="w-6 sm:w-8 h-6 sm:h-8 text-red-300 mr-2 sm:mr-3" />
               <div>
-                <p className="text-sm text-blue-200">Avg Price</p>
-                <p className="text-2xl font-bold text-white">
+                <p className="text-xs sm:text-sm text-blue-200">Avg Price</p>
+                <p className="text-lg sm:text-2xl font-bold text-white">
                   ₹{cars.length > 0 ? (cars.reduce((sum, car) => sum + car.price_lakh, 0) / cars.length).toFixed(1) : '0'}L
                 </p>
               </div>
@@ -873,24 +876,11 @@ const AdminDashboard = () => {
           </div>
         </div>
 
-        {/* Info Banner */}
-        <div className="bg-blue-500/20 border border-blue-500/30 rounded-lg p-4 mb-6">
-          <div className="flex items-center">
-            <CheckCircle className="w-5 h-5 text-blue-300 mr-3" />
-            <div>
-              <p className="text-blue-100">
-                <strong>Car Rankings Integration:</strong> All cars managed here appear on the Car Rankings page. 
-                Changes made here (add, edit, delete) will immediately reflect on the rankings.
-              </p>
-            </div>
-          </div>
-        </div>
-
         {/* Controls */}
-        <div className="bg-white/10 backdrop-blur-md rounded-lg p-6 mb-8">
-          <div className="flex flex-col md:flex-row items-center justify-between space-y-4 md:space-y-0 md:space-x-4">
+        <div className="bg-white/10 backdrop-blur-md rounded-lg p-4 sm:p-6 mb-8">
+          <div className="flex flex-col space-y-4">
             {/* Search */}
-            <div className="relative flex-1 max-w-md">
+            <div className="relative w-full">
               <input
                 type="text"
                 placeholder="Search cars..."
@@ -902,11 +892,11 @@ const AdminDashboard = () => {
             </div>
 
             {/* Action Buttons */}
-            <div className="flex space-x-3">
+            <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3">
               <button
                 onClick={fetchCars}
                 disabled={loading}
-                className="px-4 py-3 bg-blue-500/20 hover:bg-blue-500/30 border border-blue-500/30 rounded-lg text-white transition-colors flex items-center disabled:opacity-50"
+                className="flex-1 sm:flex-none px-4 py-3 bg-blue-500/20 hover:bg-blue-500/30 border border-blue-500/30 rounded-lg text-white transition-colors flex items-center justify-center disabled:opacity-50"
                 title="Refresh car list"
               >
                 {loading ? (
@@ -921,7 +911,7 @@ const AdminDashboard = () => {
               
               <button
                 onClick={handleAddCar}
-                className="px-6 py-3 bg-green-500 hover:bg-green-600 rounded-lg text-white font-semibold transition-colors flex items-center"
+                className="flex-1 sm:flex-none px-6 py-3 bg-green-500 hover:bg-green-600 rounded-lg text-white font-semibold transition-colors flex items-center justify-center"
               >
                 <Plus className="w-5 h-5 mr-2" />
                 Add New Car
@@ -954,26 +944,15 @@ const AdminDashboard = () => {
               <p className="text-gray-400">Try adjusting your search or add a new car</p>
             </div>
           ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead className="bg-white/5">
-                  <tr className="text-left">
-                    <th className="p-4 text-blue-100 font-semibold">Rank</th>
-                    <th className="p-4 text-blue-100 font-semibold">Car Details</th>
-                    <th className="p-4 text-blue-100 font-semibold">Price</th>
-                    <th className="p-4 text-blue-100 font-semibold">Mileage</th>
-                    <th className="p-4 text-blue-100 font-semibold">CO₂</th>
-                    <th className="p-4 text-blue-100 font-semibold">AI Score</th>
-                    <th className="p-4 text-blue-100 font-semibold">Fuel Type</th>
-                    <th className="p-4 text-blue-100 font-semibold">Actions</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-white/10">
+            <>
+              {/* Mobile Card Layout */}
+              <div className="block sm:hidden">
+                <div className="divide-y divide-white/10">
                   {filteredCars.map((car, index) => (
-                    <tr key={car._id} className="hover:bg-white/5 transition-colors">
-                      <td className="p-4">
+                    <div key={car._id} className="p-4">
+                      <div className="flex items-start justify-between mb-3">
                         <div className="flex items-center">
-                          <span className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${
+                          <span className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold mr-2 ${
                             index === 0 ? 'bg-yellow-500/20 text-yellow-300' :
                             index === 1 ? 'bg-gray-400/20 text-gray-300' :
                             index === 2 ? 'bg-orange-600/20 text-orange-300' :
@@ -982,37 +961,13 @@ const AdminDashboard = () => {
                             #{index + 1}
                           </span>
                           {index < 3 && (
-                            <Trophy className={`w-4 h-4 ml-2 ${
+                            <Trophy className={`w-4 h-4 ${
                               index === 0 ? 'text-yellow-400' :
                               index === 1 ? 'text-gray-400' :
                               'text-orange-600'
                             }`} />
                           )}
                         </div>
-                      </td>
-                      <td className="p-4">
-                        <div>
-                          <div className="font-medium text-white">{car.make} {car.model}</div>
-                          <div className="text-sm text-blue-200">
-                            Engine: {car.engine_size_l}L | Comfort: {car.comfort_rating}/10 | Space: {car.space_rating}/10
-                          </div>
-                        </div>
-                      </td>
-                      <td className="p-4 text-blue-100">₹{car.price_lakh}L</td>
-                      <td className="p-4 text-blue-100">{car.mileage_kmpl} km/l</td>
-                      <td className="p-4 text-blue-100">{car.co2_gkm} g/km</td>
-                      <td className="p-4">
-                        <span className={`px-2 py-1 rounded-full text-sm font-medium ${
-                          car.score >= 40 ? 'bg-green-500/20 text-green-300' :
-                          car.score >= 30 ? 'bg-yellow-500/20 text-yellow-300' :
-                          car.score >= 20 ? 'bg-orange-500/20 text-orange-300' :
-                          'bg-red-500/20 text-red-300'
-                        }`}>
-                          {car.score}
-                        </span>
-                      </td>
-                      <td className="p-4 text-blue-100">{car.fuel_type}</td>
-                      <td className="p-4">
                         <div className="flex space-x-2">
                           <button
                             onClick={() => handleEditCar(car)}
@@ -1029,12 +984,145 @@ const AdminDashboard = () => {
                             <Trash2 className="w-4 h-4" />
                           </button>
                         </div>
-                      </td>
-                    </tr>
+                      </div>
+                      
+                      <div className="mb-3">
+                        <h3 className="font-medium text-white text-lg">{car.make} {car.model}</h3>
+                        <div className="flex items-center mt-1">
+                          <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                            car.score >= 40 ? 'bg-green-500/20 text-green-300' :
+                            car.score >= 30 ? 'bg-yellow-500/20 text-yellow-300' :
+                            car.score >= 20 ? 'bg-orange-500/20 text-orange-300' :
+                            'bg-red-500/20 text-red-300'
+                          }`}>
+                            AI Score: {car.score}
+                          </span>
+                          <span className="ml-2 px-2 py-1 bg-white/10 rounded text-xs text-blue-200">
+                            {car.fuel_type}
+                          </span>
+                        </div>
+                      </div>
+                      
+                      <div className="grid grid-cols-2 gap-3 mb-3">
+                        <div className="bg-white/5 rounded p-2">
+                          <div className="flex items-center text-blue-200 text-xs mb-1">
+                            <DollarSign className="w-3 h-3 mr-1" />
+                            Price
+                          </div>
+                          <div className="text-white font-semibold">₹{car.price_lakh}L</div>
+                        </div>
+                        
+                        <div className="bg-white/5 rounded p-2">
+                          <div className="flex items-center text-blue-200 text-xs mb-1">
+                            <Fuel className="w-3 h-3 mr-1" />
+                            Mileage
+                          </div>
+                          <div className="text-white font-semibold">{car.mileage_kmpl} km/l</div>
+                        </div>
+                        
+                        <div className="bg-white/5 rounded p-2">
+                          <div className="text-blue-200 text-xs mb-1">CO₂ Emissions</div>
+                          <div className="text-white font-semibold">{car.co2_gkm} g/km</div>
+                        </div>
+                        
+                        <div className="bg-white/5 rounded p-2">
+                          <div className="text-blue-200 text-xs mb-1">Engine Size</div>
+                          <div className="text-white font-semibold">{car.engine_size_l}L</div>
+                        </div>
+                      </div>
+                      
+                      <div className="flex justify-between text-xs text-blue-200 pt-2 border-t border-white/10">
+                        <span>Comfort: {car.comfort_rating}/10</span>
+                        <span>Space: {car.space_rating}/10</span>
+                      </div>
+                    </div>
                   ))}
-                </tbody>
-              </table>
-            </div>
+                </div>
+              </div>
+
+              {/* Desktop Table Layout */}
+              <div className="hidden sm:block overflow-x-auto">
+                <table className="w-full">
+                  <thead className="bg-white/5">
+                    <tr className="text-left">
+                      <th className="p-4 text-blue-100 font-semibold">Rank</th>
+                      <th className="p-4 text-blue-100 font-semibold">Car Details</th>
+                      <th className="p-4 text-blue-100 font-semibold">Price</th>
+                      <th className="p-4 text-blue-100 font-semibold">Mileage</th>
+                      <th className="p-4 text-blue-100 font-semibold">CO₂</th>
+                      <th className="p-4 text-blue-100 font-semibold">AI Score</th>
+                      <th className="p-4 text-blue-100 font-semibold">Fuel Type</th>
+                      <th className="p-4 text-blue-100 font-semibold">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-white/10">
+                    {filteredCars.map((car, index) => (
+                      <tr key={car._id} className="hover:bg-white/5 transition-colors">
+                        <td className="p-4">
+                          <div className="flex items-center">
+                            <span className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${
+                              index === 0 ? 'bg-yellow-500/20 text-yellow-300' :
+                              index === 1 ? 'bg-gray-400/20 text-gray-300' :
+                              index === 2 ? 'bg-orange-600/20 text-orange-300' :
+                              'bg-blue-500/20 text-blue-300'
+                            }`}>
+                              #{index + 1}
+                            </span>
+                            {index < 3 && (
+                              <Trophy className={`w-4 h-4 ml-2 ${
+                                index === 0 ? 'text-yellow-400' :
+                                index === 1 ? 'text-gray-400' :
+                                'text-orange-600'
+                              }`} />
+                            )}
+                          </div>
+                        </td>
+                        <td className="p-4">
+                          <div>
+                            <div className="font-medium text-white">{car.make} {car.model}</div>
+                            <div className="text-sm text-blue-200">
+                              Engine: {car.engine_size_l}L | Comfort: {car.comfort_rating}/10 | Space: {car.space_rating}/10
+                            </div>
+                          </div>
+                        </td>
+                        <td className="p-4 text-blue-100">₹{car.price_lakh}L</td>
+                        <td className="p-4 text-blue-100">{car.mileage_kmpl} km/l</td>
+                        <td className="p-4 text-blue-100">{car.co2_gkm} g/km</td>
+                        <td className="p-4">
+                          <span className={`px-2 py-1 rounded-full text-sm font-medium ${
+                            car.score >= 40 ? 'bg-green-500/20 text-green-300' :
+                            car.score >= 30 ? 'bg-yellow-500/20 text-yellow-300' :
+                            car.score >= 20 ? 'bg-orange-500/20 text-orange-300' :
+                            'bg-red-500/20 text-red-300'
+                          }`}>
+                            {car.score}
+                          </span>
+                        </td>
+                        <td className="p-4 text-blue-100">{car.fuel_type}</td>
+                        <td className="p-4">
+                          <div className="flex space-x-2">
+                            <button
+                              onClick={() => handleEditCar(car)}
+                              className="p-2 bg-blue-500/20 hover:bg-blue-500/30 rounded-lg text-blue-300 hover:text-white transition-colors"
+                              title="Edit car"
+                            >
+                              <Edit3 className="w-4 h-4" />
+                            </button>
+                            <button
+                              onClick={() => setDeleteConfirm(car)}
+                              className="p-2 bg-red-500/20 hover:bg-red-500/30 rounded-lg text-red-300 hover:text-white transition-colors"
+                              title="Delete car"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </>
           )}
         </div>
       </div>
@@ -1054,18 +1142,18 @@ const AdminDashboard = () => {
       {/* Delete Confirmation Modal */}
       {deleteConfirm && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white/10 backdrop-blur-md rounded-lg p-6 w-full max-w-md">
+          <div className="bg-white/10 backdrop-blur-md rounded-lg p-4 sm:p-6 w-full max-w-md mx-4">
             <div className="flex items-center mb-4">
               <AlertTriangle className="w-8 h-8 text-red-400 mr-3" />
               <h2 className="text-xl font-semibold text-white">Confirm Deletion</h2>
             </div>
             
-            <p className="text-blue-100 mb-6">
+            <p className="text-blue-100 mb-6 text-sm sm:text-base">
               Are you sure you want to delete <strong>{deleteConfirm.make} {deleteConfirm.model}</strong>? 
               This car will be removed from both the admin database and the Car Rankings page. This action cannot be undone.
             </p>
             
-            <div className="flex space-x-4">
+            <div className="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-4">
               <button
                 onClick={() => handleDeleteCar(deleteConfirm)}
                 className="flex-1 p-3 bg-red-500 hover:bg-red-600 rounded-lg text-white font-semibold transition-colors"
