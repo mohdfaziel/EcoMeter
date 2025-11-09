@@ -234,7 +234,7 @@ const PredictionForm = ({ onPredictionComplete }) => {
           {loading ? (
             <div className="flex items-center justify-center">
               <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
-              Predicting...
+              Processing prediction...
             </div>
           ) : (
             'Predict CO₂ Emissions'
@@ -243,11 +243,12 @@ const PredictionForm = ({ onPredictionComplete }) => {
       </form>
 
       {/* Info Text */}
-      <div className="mt-4 p-3 bg-blue-50 rounded-md">
-        <p className="text-xs text-blue-800">
-          <strong>Note:</strong> This prediction is based on a machine learning model trained on real car data. 
-          Results are estimates and may vary from actual emissions.
-        </p>
+      <div className="mt-4 p-2 bg-blue-50 rounded-md">
+        {!loading && (
+          <p className="text-xs text-blue-600">
+            <strong>First prediction may take 30-45 seconds</strong> as the system initializes.
+          </p>
+        )}
       </div>
     </div>
   );

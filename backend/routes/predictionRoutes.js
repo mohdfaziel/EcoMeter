@@ -4,6 +4,42 @@ import Prediction from '../models/Prediction.js';
 
 const router = express.Router();
 
+// Function to wake up ML service on Render
+const wakeUpMLService = async (mlServiceUrl) => {
+  try {
+    console.log('🔥 Waking up ML service...');
+    
+    // First, ping the health endpoint to wake up the service
+    const healthResponse = await axios.get(`${mlServiceUrl}/health`, {
+      timeout: 30000, // 30 seconds for wake up
+      headers: {
+        'User-Agent': 'EcoMeter-Backend-Warmup'
+      }
+    });
+    
+    console.log('✅ ML service is awake:', healthResponse.data);
+    return true;
+  } catch (error) {
+    console.log('⚠️ Failed to wake up ML service:', error.message);
+    
+    // If first attempt fails, try root endpoint
+    try {
+      console.log('🔥 Trying root endpoint to wake up ML service...');
+      await axios.get(`${mlServiceUrl}/`, {
+        timeout: 30000,
+        headers: {
+          'User-Agent': 'EcoMeter-Backend-Warmup'
+        }
+      });
+      console.log('✅ ML service woke up via root endpoint');
+      return true;
+    } catch (rootError) {
+      console.log('❌ ML service wake up failed completely:', rootError.message);
+      return false;
+    }
+  }
+};
+
 // Validation middleware
 const validatePredictionInput = (req, res, next) => {
   const { engineSize, cylinders, fuelConsumption } = req.body;
@@ -48,15 +84,21 @@ router.post('/predict', validatePredictionInput, async (req, res) => {
     
     console.log('🔍 Prediction request:', { engineSize, cylinders, fuelConsumption });
 
-    // Call ML Service
     const mlServiceUrl = process.env.ML_SERVICE_URL || 'http://localhost:8001';
     
+    // First, wake up the ML service (important for Render free tier)
+    await wakeUpMLService(mlServiceUrl);
+    
+    // Wait a brief moment for the service to fully initialize
+    await new Promise(resolve => setTimeout(resolve, 2000));
+    
+    // Call ML Service
     const mlResponse = await axios.post(`${mlServiceUrl}/predict`, {
       ENGINESIZE: engineSize,
       CYLINDERS: cylinders,
       FUELCONSUMPTION_COMB: fuelConsumption
     }, {
-      timeout: 10000, // 10 second timeout
+      timeout: 15000, // 15 second timeout (increased for slow startup)
       headers: {
         'Content-Type': 'application/json'
       }
