@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route, Link, useLocation } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { 
@@ -10,17 +11,201 @@ import {
   Database,
   Zap,
   X,
-  User
+  User,
+  Trophy,
+  Shield,
+  Home,
+  Menu,
+  XCircle
 } from 'lucide-react';
 
 import PredictionForm from './components/PredictionForm';
 import HistoryList from './components/HistoryList';
+import CarRankings from './pages/CarRankings';
+import AdminDashboard from './pages/AdminDashboard';
 import { healthCheck } from './services/api';
 
-function App() {
+// HomePage component with prediction functionality
+const HomePage = () => {
   const [refreshHistoryTrigger, setRefreshHistoryTrigger] = useState(0);
-  const [backendStatus, setBackendStatus] = useState('checking');
   const [lastPrediction, setLastPrediction] = useState(null);
+
+  // Handle successful prediction
+  const handlePredictionComplete = (predictionData) => {
+    setLastPrediction(predictionData);
+    setRefreshHistoryTrigger(prev => prev + 1); // Trigger history refresh
+  };
+
+  return (
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      {/* Hero Section */}
+      <div className="text-center mb-12">
+        <h2 className="text-2xl md:text-4xl font-bold text-white mb-4">
+          Predict Your Car's CO₂ Emissions
+        </h2>
+        <p className="text-lg md:text-xl text-blue-100 max-w-3xl mx-auto">
+         This prediction is based on a machine learning model trained on real car data. 
+        Results are estimates and may vary from actual emissions.
+        </p>
+      </div>
+
+      {/* Latest Prediction Display */}
+      {lastPrediction && (
+        <div className="mb-8">
+          <div className="bg-green-500/20 backdrop-blur-md border border-green-500/30 rounded-lg p-6 text-center">
+            <h3 className="text-lg font-semibold text-white mb-2">Latest Prediction</h3>
+            <div className="text-2xl md:text-3xl font-bold text-green-300 mb-2">
+              {lastPrediction.formattedPrediction}
+            </div>
+            <p className="text-green-100 text-sm">
+              Engine: {lastPrediction.input.engineSize}L • 
+              Cylinders: {lastPrediction.input.cylinders} • 
+              Fuel: {lastPrediction.input.fuelConsumption}L/100km
+            </p>
+          </div>
+        </div>
+      )}
+
+      {/* Main Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        {/* Prediction Form */}
+        <div className="lg:col-span-1">
+          <PredictionForm onPredictionComplete={handlePredictionComplete} />
+        </div>
+
+        {/* History List */}
+        <div className="lg:col-span-2">
+          <HistoryList refreshTrigger={refreshHistoryTrigger} />
+        </div>
+      </div>
+
+      {/* Features Section */}
+      <div className="mt-16 grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div className="bg-white/10 backdrop-blur-md rounded-lg p-6 text-center">
+          <Zap className="mx-auto mb-4 text-yellow-400" size={48} />
+          <h3 className="text-lg font-semibold text-white mb-2">Instant Predictions</h3>
+          <p className="text-blue-100 text-sm">
+            Get CO₂ emission predictions in seconds using our trained machine learning model.
+          </p>
+        </div>
+        
+        <div className="bg-white/10 backdrop-blur-md rounded-lg p-6 text-center">
+          <Database className="mx-auto mb-4 text-blue-400" size={48} />
+          <h3 className="text-lg font-semibold text-white mb-2">Prediction History</h3>
+          <p className="text-blue-100 text-sm">
+            Track all your predictions with detailed history and the ability to compare results.
+          </p>
+        </div>
+        
+        <div className="bg-white/10 backdrop-blur-md rounded-lg p-6 text-center">
+          <Leaf className="mx-auto mb-4 text-green-400" size={48} />
+          <h3 className="text-lg font-semibold text-white mb-2">Environmental Impact</h3>
+          <p className="text-blue-100 text-sm">
+            Make informed decisions about your vehicle's environmental footprint.
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// Navigation Component
+const Navigation = ({ backendStatus, showStatusTooltip, setShowStatusTooltip, getStatusIndicator }) => {
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const location = useLocation();
+
+  const navItems = [
+    { path: '/', label: 'Home', icon: Home },
+    { path: '/car-rankings', label: 'Car Rankings', icon: Trophy },
+    { path: '/admin', label: 'Admin', icon: Shield }
+  ];
+
+  const isActivePage = (path) => {
+    if (path === '/' && location.pathname === '/') return true;
+    if (path !== '/' && location.pathname.startsWith(path)) return true;
+    return false;
+  };
+
+  return (
+    <header className="bg-white/10 backdrop-blur-md border-b border-white/20 sticky top-0 z-40">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between py-4">
+          {/* Logo and Brand */}
+          <Link to="/" className="flex items-center space-x-3 hover:opacity-80 transition-opacity">
+            <div className="p-2 bg-green-500 rounded-lg">
+              <Leaf className="w-6 h-6 text-white" />
+            </div>
+            <div>
+              <h1 className="text-xl font-bold text-white">EcoMeter</h1>
+              <p className="text-sm text-blue-100">Car CO₂ Emissions Predictor</p>
+            </div>
+          </Link>
+
+          {/* Desktop Navigation */}
+          <nav className="hidden md:flex items-center space-x-6">
+            {navItems.map(({ path, label, icon: Icon }) => (
+              <Link
+                key={path}
+                to={path}
+                className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-colors ${
+                  isActivePage(path)
+                    ? 'bg-white/20 text-white'
+                    : 'text-blue-100 hover:text-white hover:bg-white/10'
+                }`}
+              >
+                <Icon className="w-4 h-4" />
+                <span>{label}</span>
+              </Link>
+            ))}
+          </nav>
+
+          {/* Status and Mobile Menu Button */}
+          <div className="flex items-center space-x-4">
+            {getStatusIndicator()}
+            
+            {/* Mobile Menu Button */}
+            <button
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              className="md:hidden text-white hover:text-blue-200 transition-colors"
+            >
+              {isMobileMenuOpen ? (
+                <XCircle className="w-6 h-6" />
+              ) : (
+                <Menu className="w-6 h-6" />
+              )}
+            </button>
+          </div>
+        </div>
+
+        {/* Mobile Navigation */}
+        {isMobileMenuOpen && (
+          <nav className="md:hidden pb-4 border-t border-white/20 mt-4 pt-4">
+            <div className="space-y-2">
+              {navItems.map(({ path, label, icon: Icon }) => (
+                <Link
+                  key={path}
+                  to={path}
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className={`flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors ${
+                    isActivePage(path)
+                      ? 'bg-white/20 text-white'
+                      : 'text-blue-100 hover:text-white hover:bg-white/10'
+                  }`}
+                >
+                  <Icon className="w-5 h-5" />
+                  <span>{label}</span>
+                </Link>
+              ))}
+            </div>
+          </nav>
+        )}
+      </div>
+    </header>
+  );
+};
+
+function App() {
+  const [backendStatus, setBackendStatus] = useState('checking');
   const [showStatusTooltip, setShowStatusTooltip] = useState(false);
 
   // Check backend health on mount
@@ -38,12 +223,6 @@ function App() {
       console.error('❌ Backend health check failed:', error);
       toast.error('Backend service is unavailable. Some features may not work.');
     }
-  };
-
-  // Handle successful prediction
-  const handlePredictionComplete = (predictionData) => {
-    setLastPrediction(predictionData);
-    setRefreshHistoryTrigger(prev => prev + 1); // Trigger history refresh
   };
 
   // Get status indicator with custom tooltip
@@ -102,146 +281,73 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-600 via-purple-600 to-blue-800">
-      {/* Header */}
-      <header className="bg-white/10 backdrop-blur-md border-b border-white/20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              <div className="p-2 bg-green-500 rounded-lg">
-                <Leaf className="w-6 h-6 text-white" />
-              </div>
-              <div>
-                <h1 className="text-xl font-bold text-white">EcoMeter</h1>
-                <p className="text-sm text-blue-100">Car CO₂ Emissions Predictor</p>
-              </div>
-            </div>
-            
-            <div className="flex items-center">
-              {getStatusIndicator()}
-            </div>
-          </div>
-        </div>
-      </header>
+    <Router>
+      <div className="min-h-screen bg-gradient-to-br from-blue-600 via-purple-600 to-blue-800">
+        {/* Navigation */}
+        <Navigation 
+          backendStatus={backendStatus}
+          showStatusTooltip={showStatusTooltip}
+          setShowStatusTooltip={setShowStatusTooltip}
+          getStatusIndicator={getStatusIndicator}
+        />
 
-      {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Hero Section */}
-        <div className="text-center mb-12">
-          <h2 className="text-2xl md:text-4xl font-bold text-white mb-4">
-            Predict Your Car's CO₂ Emissions
-          </h2>
-          <p className="text-lg md:text-xl text-blue-100 max-w-3xl mx-auto">
-           This prediction is based on a machine learning model trained on real car data. 
-          Results are estimates and may vary from actual emissions.
-          </p>
-        </div>
+        {/* Main Content */}
+        <main>
+          <Routes>
+            <Route path="/" element={<HomePage />} />
+            <Route path="/car-rankings" element={<CarRankings />} />
+            <Route path="/admin" element={<AdminDashboard />} />
+          </Routes>
+        </main>
 
-        {/* Latest Prediction Display */}
-        {lastPrediction && (
-          <div className="mb-8">
-            <div className="bg-green-500/20 backdrop-blur-md border border-green-500/30 rounded-lg p-6 text-center">
-              <h3 className="text-lg font-semibold text-white mb-2">Latest Prediction</h3>
-              <div className="text-2xl md:text-3xl font-bold text-green-300 mb-2">
-                {lastPrediction.formattedPrediction}
-              </div>
-              <p className="text-green-100 text-sm">
-                Engine: {lastPrediction.input.engineSize}L • 
-                Cylinders: {lastPrediction.input.cylinders} • 
-                Fuel: {lastPrediction.input.fuelConsumption}L/100km
-              </p>
-            </div>
-          </div>
-        )}
-
-        {/* Main Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Prediction Form */}
-          <div className="lg:col-span-1">
-            <PredictionForm onPredictionComplete={handlePredictionComplete} />
-          </div>
-
-          {/* History List */}
-          <div className="lg:col-span-2">
-            <HistoryList refreshTrigger={refreshHistoryTrigger} />
-          </div>
-        </div>
-
-        {/* Features Section */}
-        <div className="mt-16 grid grid-cols-1 md:grid-cols-3 gap-8">
-          <div className="bg-white/10 backdrop-blur-md rounded-lg p-6 text-center">
-            <Zap className="mx-auto mb-4 text-yellow-400" size={48} />
-            <h3 className="text-lg font-semibold text-white mb-2">Instant Predictions</h3>
-            <p className="text-blue-100 text-sm">
-              Get CO₂ emission predictions in seconds using our trained machine learning model.
-            </p>
-          </div>
-          
-          <div className="bg-white/10 backdrop-blur-md rounded-lg p-6 text-center">
-            <Database className="mx-auto mb-4 text-blue-400" size={48} />
-            <h3 className="text-lg font-semibold text-white mb-2">Prediction History</h3>
-            <p className="text-blue-100 text-sm">
-              Track all your predictions with detailed history and the ability to compare results.
-            </p>
-          </div>
-          
-          <div className="bg-white/10 backdrop-blur-md rounded-lg p-6 text-center">
-            <Leaf className="mx-auto mb-4 text-green-400" size={48} />
-            <h3 className="text-lg font-semibold text-white mb-2">Environmental Impact</h3>
-            <p className="text-blue-100 text-sm">
-              Make informed decisions about your vehicle's environmental footprint.
-            </p>
-          </div>
-        </div>
-      </main>
-
-      {/* Footer */}
-      <footer className="bg-white/5 backdrop-blur-md border-t border-white/20 mt-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="flex flex-col md:flex-row items-center justify-between space-y-4 md:space-y-0">
-            {/* Left side - Copyright and Description */}
-            <div className="text-center md:text-left">
-              <div className="flex items-center justify-center md:justify-start space-x-2 mb-2">
-                <div className="p-1 bg-green-500 rounded">
-                  <Leaf className="w-4 h-4 text-white" />
+        {/* Footer */}
+        <footer className="bg-white/5 backdrop-blur-md border-t border-white/20 mt-16">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div className="flex flex-col md:flex-row items-center justify-between space-y-4 md:space-y-0">
+              {/* Left side - Copyright and Description */}
+              <div className="text-center md:text-left">
+                <div className="flex items-center justify-center md:justify-start space-x-2 mb-2">
+                  <div className="p-1 bg-green-500 rounded">
+                    <Leaf className="w-4 h-4 text-white" />
+                  </div>
+                  <span className="text-white font-semibold">EcoMeter</span>
                 </div>
-                <span className="text-white font-semibold">EcoMeter</span>
+                <p className="text-sm text-blue-100">
+                  © 2025 EcoMeter. Helping you understand your vehicle's environmental impact.
+                </p>
               </div>
-              <p className="text-sm text-blue-100">
-                © 2025 EcoMeter. Helping you understand your vehicle's environmental impact.
-              </p>
-            </div>
-            
-            {/* Right side - Portfolio Link */}
-            <div className="flex items-center">
-              <a
-                href="https://faziel.vercel.app/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-blue-100 hover:text-white transition-colors duration-200 p-2 hover:bg-white/10 rounded-lg"
-                title="Developer Portfolio"
-              >
-                <User className="w-5 h-5" />
-              </a>
+              
+              {/* Right side - Portfolio Link */}
+              <div className="flex items-center">
+                <a
+                  href="https://faziel.vercel.app/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-blue-100 hover:text-white transition-colors duration-200 p-2 hover:bg-white/10 rounded-lg"
+                  title="Developer Portfolio"
+                >
+                  <User className="w-5 h-5" />
+                </a>
+              </div>
             </div>
           </div>
-        </div>
-      </footer>
+        </footer>
 
-      {/* Toast Notifications */}
-      <ToastContainer
-        position="top-right"
-        autoClose={5000}
-        hideProgressBar={false}
-        newestOnTop={false}
-        closeOnClick
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-        theme="light"
-      />
-    </div>
+        {/* Toast Notifications */}
+        <ToastContainer
+          position="top-right"
+          autoClose={5000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+          theme="light"
+        />
+      </div>
+    </Router>
   );
 }
 

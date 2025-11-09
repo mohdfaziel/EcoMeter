@@ -5,6 +5,7 @@ import rateLimit from 'express-rate-limit';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import predictionRoutes from './routes/predictionRoutes.js';
+import carRoutes from './routes/carRoutes.js';
 
 // Load environment variables
 dotenv.config();
@@ -133,6 +134,8 @@ app.get('/', (req, res) => {
       predict: 'POST /api/predict',
       history: 'GET /api/history',
       stats: 'GET /api/history/stats',
+      cars: 'GET /api/cars',
+      carRankings: 'GET /api/cars/top',
       health: 'GET /health'
     },
     docs: {
@@ -144,6 +147,7 @@ app.get('/', (req, res) => {
 
 // API routes
 app.use('/api', predictionRoutes);
+app.use('/api', carRoutes);
 
 // 404 handler
 app.use('*', (req, res) => {

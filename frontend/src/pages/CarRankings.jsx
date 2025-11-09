@@ -1,0 +1,550 @@
+import React, { useState, useEffect } from 'react';
+import { toast } from 'react-toastify';
+import { 
+  Trophy, 
+  Filter, 
+  Search, 
+  SortAsc, 
+  SortDesc, 
+  Car, 
+  Fuel, 
+  DollarSign, 
+  Gauge, 
+  Heart, 
+  Home, 
+  Loader2,
+  TrendingUp,
+  BarChart3,
+  Zap
+} from 'lucide-react';
+
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:10000';
+
+// Simple chart components since we don't have chart.js yet
+const SimpleBarChart = ({ data, title }) => {
+  if (!data || data.length === 0) return null;
+  
+  const maxValue = Math.max(...data.map(item => item.co2_gkm));
+  
+  return (
+    <div className="bg-white/10 backdrop-blur-md rounded-lg p-6">
+      <h3 className="text-lg font-semibold text-white mb-4 flex items-center">
+        <BarChart3 className="w-5 h-5 mr-2" />
+        {title}
+      </h3>
+      <div className="space-y-3">
+        {data.slice(0, 8).map((item, index) => (
+          <div key={index} className="flex items-center">
+            <div className="w-24 text-sm text-blue-100 truncate">
+              {item.model}
+            </div>
+            <div className="flex-1 mx-3">
+              <div className="bg-gray-700 rounded-full h-4 relative overflow-hidden">
+                <div 
+                  className="bg-gradient-to-r from-red-500 to-orange-500 h-full rounded-full transition-all duration-500"
+                  style={{ width: `${(item.co2_gkm / maxValue) * 100}%` }}
+                ></div>
+              </div>
+            </div>
+            <div className="w-16 text-sm text-white text-right">
+              {item.co2_gkm}g
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+const SimpleScatterPlot = ({ data, title }) => {
+  if (!data || data.length === 0) return null;
+  
+  const maxPrice = Math.max(...data.map(item => item.price_lakh));
+  const maxMileage = Math.max(...data.map(item => item.mileage_kmpl));
+  
+  return (
+    <div className="bg-white/10 backdrop-blur-md rounded-lg p-6">
+      <h3 className="text-lg font-semibold text-white mb-4 flex items-center">
+        <TrendingUp className="w-5 h-5 mr-2" />
+        {title}
+      </h3>
+      <div className="relative h-64 bg-gray-800/50 rounded-lg p-4">
+        {/* Y-axis label */}
+        <div className="absolute -left-4 top-0 bottom-0 flex items-center">
+          <span className="text-xs text-blue-200 transform -rotate-90 whitespace-nowrap">
+            Mileage (km/l)
+          </span>
+        </div>
+        
+        {/* X-axis label */}
+        <div className="absolute -bottom-8 left-0 right-0 text-center">
+          <span className="text-xs text-blue-200">Price (₹ Lakh)</span>
+        </div>
+        
+        {/* Data points */}
+        <div className="relative w-full h-full">
+          {data.slice(0, 15).map((item, index) => (
+            <div
+              key={index}
+              className="absolute w-3 h-3 bg-blue-500 rounded-full border-2 border-white hover:scale-150 transition-transform cursor-pointer group"
+              style={{
+                left: `${(item.price_lakh / maxPrice) * 90}%`,
+                bottom: `${(item.mileage_kmpl / maxMileage) * 90}%`
+              }}
+              title={`${item.make} ${item.model}`}
+            >
+              <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-black text-white text-xs p-1 rounded opacity-0 group-hover:opacity-100 whitespace-nowrap pointer-events-none z-10">
+                {item.make} {item.model}<br />
+                ₹{item.price_lakh}L | {item.mileage_kmpl}km/l
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const CarRankings = () => {
+  const [cars, setCars] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [stats, setStats] = useState(null);
+  
+  // Filter states
+  const [filters, setFilters] = useState({
+    fuelType: 'all',
+    make: 'all',
+    sortBy: 'score',
+    sortOrder: 'desc',
+    search: '',
+    minPrice: '',
+    maxPrice: ''
+  });
+  
+  const [availableFilters, setAvailableFilters] = useState({
+    fuelTypes: [],
+    makes: []
+  });
+  
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pagination, setPagination] = useState(null);
+
+  // Fetch available filter options
+  useEffect(() => {
+    const fetchFilterOptions = async () => {
+      try {
+        const [fuelTypesResponse, makesResponse] = await Promise.all([
+          fetch(`${API_URL}/api/cars/filter/fuel-types`),
+          fetch(`${API_URL}/api/cars/filter/makes`)
+        ]);
+        
+        const fuelTypesData = await fuelTypesResponse.json();
+        const makesData = await makesResponse.json();
+        
+        if (fuelTypesData.success) {
+          setAvailableFilters(prev => ({ ...prev, fuelTypes: fuelTypesData.data }));
+        }
+        
+        if (makesData.success) {
+          setAvailableFilters(prev => ({ ...prev, makes: makesData.data }));
+        }
+      } catch (error) {
+        console.error('Error fetching filter options:', error);
+      }
+    };
+    
+    fetchFilterOptions();
+  }, []);
+
+  // Fetch cars data
+  useEffect(() => {
+    fetchCars();
+  }, [filters, currentPage]);
+  
+  // Fetch statistics
+  useEffect(() => {
+    fetchStats();
+  }, []);
+
+  const fetchCars = async () => {
+    setLoading(true);
+    setError(null);
+    
+    try {
+      const queryParams = new URLSearchParams({
+        ...filters,
+        page: currentPage,
+        limit: 10
+      });
+      
+      // Remove empty values
+      Object.keys(queryParams).forEach(key => {
+        if (!queryParams.get(key) || queryParams.get(key) === 'all') {
+          queryParams.delete(key);
+        }
+      });
+      
+      const response = await fetch(`${API_URL}/api/cars?${queryParams}`);
+      const data = await response.json();
+      
+      if (data.success) {
+        setCars(data.data);
+        setPagination(data.pagination);
+      } else {
+        throw new Error(data.error || 'Failed to fetch cars');
+      }
+    } catch (error) {
+      console.error('Error fetching cars:', error);
+      setError(error.message);
+      toast.error('Failed to load car rankings');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchStats = async () => {
+    try {
+      const response = await fetch(`${API_URL}/api/cars/stats`);
+      const data = await response.json();
+      
+      if (data.success) {
+        setStats(data.data);
+      }
+    } catch (error) {
+      console.error('Error fetching stats:', error);
+    }
+  };
+
+  const handleFilterChange = (key, value) => {
+    setFilters(prev => ({ ...prev, [key]: value }));
+    setCurrentPage(1); // Reset to first page when filters change
+  };
+
+  const handleSearch = (e) => {
+    if (e.key === 'Enter' || e.type === 'click') {
+      handleFilterChange('search', e.target.value || filters.search);
+    }
+  };
+
+  const resetFilters = () => {
+    setFilters({
+      fuelType: 'all',
+      make: 'all',
+      sortBy: 'score',
+      sortOrder: 'desc',
+      search: '',
+      minPrice: '',
+      maxPrice: ''
+    });
+    setCurrentPage(1);
+  };
+
+  const getRankIcon = (rank) => {
+    if (rank === 1) return <Trophy className="w-6 h-6 text-yellow-400" />;
+    if (rank === 2) return <Trophy className="w-6 h-6 text-gray-300" />;
+    if (rank === 3) return <Trophy className="w-6 h-6 text-amber-600" />;
+    return <span className="w-6 h-6 flex items-center justify-center text-lg font-bold text-blue-200">#{rank}</span>;
+  };
+
+  const getScoreColor = (score) => {
+    if (score >= 40) return 'text-green-400';
+    if (score >= 30) return 'text-yellow-400';
+    if (score >= 20) return 'text-orange-400';
+    return 'text-red-400';
+  };
+
+  const getScoreBgColor = (score) => {
+    if (score >= 40) return 'bg-green-500/20 border-green-500/30';
+    if (score >= 30) return 'bg-yellow-500/20 border-yellow-500/30';
+    if (score >= 20) return 'bg-orange-500/20 border-orange-500/30';
+    return 'bg-red-500/20 border-red-500/30';
+  };
+
+  if (loading && cars.length === 0) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-600 via-purple-600 to-blue-800 flex items-center justify-center">
+        <div className="text-center">
+          <Loader2 className="w-12 h-12 text-white animate-spin mx-auto mb-4" />
+          <p className="text-white text-lg">Loading car rankings...</p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-blue-600 via-purple-600 to-blue-800 p-4">
+      {/* Header */}
+      <div className="max-w-7xl mx-auto">
+        <div className="text-center mb-8">
+          <h1 className="text-3xl md:text-4xl font-bold text-white mb-4 flex items-center justify-center">
+            <Trophy className="w-8 h-8 mr-3 text-yellow-400" />
+            Car Rankings
+          </h1>
+          <p className="text-lg text-blue-100 max-w-3xl mx-auto">
+            Discover the top-ranked cars in India based on our AI-calculated score that balances 
+            CO₂ emissions, price, mileage, comfort, and space ratings.
+          </p>
+        </div>
+
+        {/* Filters */}
+        <div className="bg-white/10 backdrop-blur-md rounded-lg p-6 mb-8">
+          <div className="flex items-center mb-4">
+            <Filter className="w-5 h-5 text-white mr-2" />
+            <h2 className="text-lg font-semibold text-white">Filters & Search</h2>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-6 gap-4">
+            {/* Search */}
+            <div className="lg:col-span-2">
+              <label className="block text-sm text-blue-100 mb-1">Search</label>
+              <div className="relative">
+                <input
+                  type="text"
+                  placeholder="Search cars..."
+                  value={filters.search}
+                  onChange={(e) => setFilters(prev => ({ ...prev, search: e.target.value }))}
+                  onKeyPress={handleSearch}
+                  className="w-full pl-10 pr-4 py-2 bg-white/20 border border-white/30 rounded-lg text-white placeholder-blue-200 focus:outline-none focus:border-blue-400"
+                />
+                <Search className="absolute left-3 top-2.5 w-4 h-4 text-blue-200" />
+              </div>
+            </div>
+
+            {/* Fuel Type */}
+            <div>
+              <label className="block text-sm text-blue-100 mb-1">Fuel Type</label>
+              <select
+                value={filters.fuelType}
+                onChange={(e) => handleFilterChange('fuelType', e.target.value)}
+                className="w-full p-2 bg-white/20 border border-white/30 rounded-lg text-white focus:outline-none focus:border-blue-400"
+              >
+                <option value="all">All Types</option>
+                {availableFilters.fuelTypes.map(type => (
+                  <option key={type} value={type}>{type}</option>
+                ))}
+              </select>
+            </div>
+
+            {/* Make */}
+            <div>
+              <label className="block text-sm text-blue-100 mb-1">Make</label>
+              <select
+                value={filters.make}
+                onChange={(e) => handleFilterChange('make', e.target.value)}
+                className="w-full p-2 bg-white/20 border border-white/30 rounded-lg text-white focus:outline-none focus:border-blue-400"
+              >
+                <option value="all">All Makes</option>
+                {availableFilters.makes.map(make => (
+                  <option key={make} value={make}>{make}</option>
+                ))}
+              </select>
+            </div>
+
+            {/* Sort By */}
+            <div>
+              <label className="block text-sm text-blue-100 mb-1">Sort By</label>
+              <select
+                value={filters.sortBy}
+                onChange={(e) => handleFilterChange('sortBy', e.target.value)}
+                className="w-full p-2 bg-white/20 border border-white/30 rounded-lg text-white focus:outline-none focus:border-blue-400"
+              >
+                <option value="score">Rank (Score)</option>
+                <option value="co2_gkm">CO₂ Emissions</option>
+                <option value="price_lakh">Price</option>
+                <option value="mileage_kmpl">Mileage</option>
+                <option value="comfort_rating">Comfort</option>
+                <option value="space_rating">Space</option>
+              </select>
+            </div>
+
+            {/* Sort Order */}
+            <div>
+              <label className="block text-sm text-blue-100 mb-1">Order</label>
+              <button
+                onClick={() => handleFilterChange('sortOrder', filters.sortOrder === 'desc' ? 'asc' : 'desc')}
+                className="w-full p-2 bg-white/20 border border-white/30 rounded-lg text-white flex items-center justify-center hover:bg-white/30 transition-colors"
+              >
+                {filters.sortOrder === 'desc' ? (
+                  <><SortDesc className="w-4 h-4 mr-2" /> High to Low</>
+                ) : (
+                  <><SortAsc className="w-4 h-4 mr-2" /> Low to High</>
+                )}
+              </button>
+            </div>
+          </div>
+
+          {/* Price Range */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+            <div>
+              <label className="block text-sm text-blue-100 mb-1">Min Price (₹ Lakh)</label>
+              <input
+                type="number"
+                placeholder="0"
+                value={filters.minPrice}
+                onChange={(e) => handleFilterChange('minPrice', e.target.value)}
+                className="w-full p-2 bg-white/20 border border-white/30 rounded-lg text-white placeholder-blue-200 focus:outline-none focus:border-blue-400"
+              />
+            </div>
+            
+            <div>
+              <label className="block text-sm text-blue-100 mb-1">Max Price (₹ Lakh)</label>
+              <input
+                type="number"
+                placeholder="50"
+                value={filters.maxPrice}
+                onChange={(e) => handleFilterChange('maxPrice', e.target.value)}
+                className="w-full p-2 bg-white/20 border border-white/30 rounded-lg text-white placeholder-blue-200 focus:outline-none focus:border-blue-400"
+              />
+            </div>
+            
+            <div className="flex items-end">
+              <button
+                onClick={resetFilters}
+                className="w-full p-2 bg-red-500/20 hover:bg-red-500/30 border border-red-500/30 rounded-lg text-white transition-colors"
+              >
+                Reset Filters
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Main Content Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Car Rankings Table */}
+          <div className="lg:col-span-2">
+            <div className="bg-white/10 backdrop-blur-md rounded-lg overflow-hidden">
+              <div className="p-6 border-b border-white/20">
+                <h2 className="text-xl font-semibold text-white flex items-center">
+                  <Car className="w-6 h-6 mr-2" />
+                  Rankings
+                  {pagination && (
+                    <span className="ml-auto text-sm text-blue-200">
+                      {cars.length} of {pagination.totalCount} cars
+                    </span>
+                  )}
+                </h2>
+              </div>
+
+              {error ? (
+                <div className="p-6 text-center">
+                  <p className="text-red-300 mb-4">{error}</p>
+                  <button
+                    onClick={fetchCars}
+                    className="px-4 py-2 bg-blue-500 hover:bg-blue-600 rounded-lg text-white transition-colors"
+                  >
+                    Retry
+                  </button>
+                </div>
+              ) : (
+                <div className="divide-y divide-white/10">
+                  {cars.map((car) => (
+                    <div key={car._id} className="p-4 hover:bg-white/5 transition-colors">
+                      <div className="flex items-center space-x-4">
+                        {/* Rank */}
+                        <div className="flex-shrink-0 w-12 flex justify-center">
+                          {getRankIcon(car.rank)}
+                        </div>
+
+                        {/* Car Info */}
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center space-x-3 mb-2">
+                            <h3 className="text-lg font-semibold text-white truncate">
+                              {car.make} {car.model}
+                            </h3>
+                            <div className={`px-3 py-1 rounded-full border text-sm font-medium ${getScoreBgColor(car.score)}`}>
+                              <span className={getScoreColor(car.score)}>
+                                Score: {car.score}
+                              </span>
+                            </div>
+                          </div>
+                          
+                          <div className="grid grid-cols-2 md:grid-cols-5 gap-4 text-sm">
+                            <div className="flex items-center text-blue-100">
+                              <DollarSign className="w-4 h-4 mr-1" />
+                              ₹{car.price_lakh}L
+                            </div>
+                            <div className="flex items-center text-blue-100">
+                              <Gauge className="w-4 h-4 mr-1" />
+                              {car.mileage_kmpl} km/l
+                            </div>
+                            <div className="flex items-center text-blue-100">
+                              <Zap className="w-4 h-4 mr-1" />
+                              {car.co2_gkm} g/km
+                            </div>
+                            <div className="flex items-center text-blue-100">
+                              <Heart className="w-4 h-4 mr-1" />
+                              Comfort {car.comfort_rating}/10
+                            </div>
+                            <div className="flex items-center text-blue-100">
+                              <Home className="w-4 h-4 mr-1" />
+                              Space {car.space_rating}/10
+                            </div>
+                          </div>
+                          
+                          <div className="mt-2 flex items-center space-x-4 text-xs text-blue-200">
+                            <div className="flex items-center">
+                              <Fuel className="w-3 h-3 mr-1" />
+                              {car.fuel_type}
+                            </div>
+                            <div>
+                              Engine: {car.engine_size_l}L
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* Pagination */}
+              {pagination && pagination.totalPages > 1 && (
+                <div className="p-6 border-t border-white/20 flex justify-between items-center">
+                  <button
+                    onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                    disabled={!pagination.hasPrevPage}
+                    className="px-4 py-2 bg-white/20 hover:bg-white/30 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg text-white transition-colors"
+                  >
+                    Previous
+                  </button>
+                  
+                  <span className="text-blue-100">
+                    Page {pagination.currentPage} of {pagination.totalPages}
+                  </span>
+                  
+                  <button
+                    onClick={() => setCurrentPage(prev => Math.min(pagination.totalPages, prev + 1))}
+                    disabled={!pagination.hasNextPage}
+                    className="px-4 py-2 bg-white/20 hover:bg-white/30 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg text-white transition-colors"
+                  >
+                    Next
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Charts */}
+          <div className="space-y-8">
+            {stats && (
+              <>
+                <SimpleBarChart 
+                  data={stats.co2Emissions} 
+                  title="CO₂ Emissions by Model" 
+                />
+                
+                <SimpleScatterPlot 
+                  data={stats.mileagePrice} 
+                  title="Mileage vs Price" 
+                />
+              </>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default CarRankings;
