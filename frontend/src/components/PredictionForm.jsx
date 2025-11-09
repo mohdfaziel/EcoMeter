@@ -118,7 +118,7 @@ const PredictionForm = ({ onPredictionComplete }) => {
 
 
   return (
-    <div className="bg-white rounded-lg shadow-lg p-6 max-w-md mx-auto h-[600px] flex flex-col">
+    <div className="bg-white rounded-lg shadow-lg p-3 md:p-6 max-w-md mx-auto h-[600px] flex flex-col">
       <div className="text-center mb-6">
         <Car className="mx-auto mb-3 text-blue-600" size={48} />
         <h2 className="text-2xl font-bold text-gray-800 mb-2">CO₂ Prediction</h2>

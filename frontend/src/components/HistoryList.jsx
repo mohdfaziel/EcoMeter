@@ -125,7 +125,7 @@ const HistoryList = ({ refreshTrigger }) => {
   }
 
   return (
-    <div className="bg-white rounded-lg shadow-lg p-6 h-[600px] flex flex-col">
+    <div className="bg-white rounded-lg shadow-lg p-3 md:p-6 h-[600px] flex flex-col">
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center">
@@ -168,59 +168,59 @@ const HistoryList = ({ refreshTrigger }) => {
                     key={prediction._id}
                     className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow duration-200 bg-white"
                   >
-                    <div className="flex items-center justify-between">
-                      {/* Prediction Info */}
-                      <div className="flex-1">
-                        <div className="flex items-center space-x-4 mb-2">
-                          {/* CO2 Emission */}
-                          <div className="flex items-center">
-                            <TrendingUp className="w-4 h-4 mr-1 text-gray-500" />
-                            <span className="font-bold text-lg text-gray-800">
-                              {prediction.prediction.toFixed(1)} g CO₂/km
-                            </span>
-                            <span className={`ml-2 px-2 py-1 text-xs font-medium rounded-full ${category.color}`}>
-                              {category.label}
-                            </span>
-                          </div>
+                    {/* Mobile-first layout */}
+                    <div className="space-y-3">
+                      {/* Header with CO2 and Delete Button */}
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center flex-wrap gap-2">
+                          <TrendingUp className="w-4 h-4 text-gray-500" />
+                          <span className="font-bold text-lg text-gray-800">
+                            {prediction.prediction.toFixed(1)} g CO₂/km
+                          </span>
+                          <span className={`px-2 py-1 text-xs font-medium rounded-full ${category.color}`}>
+                            {category.label}
+                          </span>
                         </div>
                         
-                        {/* Car Specifications */}
-                        <div className="grid grid-cols-3 gap-4 text-sm text-gray-600 mb-2">
-                          <div>
-                            <span className="font-medium">Engine:</span> {prediction.engineSize}L
-                          </div>
-                          <div>
-                            <span className="font-medium">Cylinders:</span> {prediction.cylinders}
-                          </div>
-                          <div>
-                            <span className="font-medium">Fuel:</span> {prediction.fuelConsumption}L/100km
-                          </div>
+                        <button
+                          onClick={() => handleDeleteClick(prediction)}
+                          disabled={deleting === prediction._id}
+                          className={`p-2 rounded-md transition-colors duration-200 ${
+                            deleting === prediction._id
+                              ? 'bg-gray-100 cursor-not-allowed'
+                              : 'hover:bg-red-50 text-red-600 hover:text-red-700'
+                          }`}
+                          title="Delete prediction"
+                        >
+                          {deleting === prediction._id ? (
+                            <RefreshCw className="w-4 h-4 animate-spin" />
+                          ) : (
+                            <Trash2 className="w-4 h-4" />
+                          )}
+                        </button>
+                      </div>
+                      
+                      {/* Car Specifications - Mobile Responsive */}
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-4 text-sm text-gray-600">
+                        <div className="flex justify-between sm:block">
+                          <span className="font-medium">Engine:</span>
+                          <span>{prediction.engineSize}L</span>
                         </div>
-                        
-                        {/* Timestamp */}
-                        <div className="flex items-center text-xs text-gray-500">
-                          <Calendar className="w-3 h-3 mr-1" />
-                          {formatDate(prediction.createdAt)}
+                        <div className="flex justify-between sm:block">
+                          <span className="font-medium">Cylinders:</span>
+                          <span>{prediction.cylinders}</span>
+                        </div>
+                        <div className="flex justify-between sm:block">
+                          <span className="font-medium">Fuel:</span>
+                          <span>{prediction.fuelConsumption}L/100km</span>
                         </div>
                       </div>
-
-                      {/* Delete Button */}
-                      <button
-                        onClick={() => handleDeleteClick(prediction)}
-                        disabled={deleting === prediction._id}
-                        className={`ml-4 p-2 rounded-md transition-colors duration-200 ${
-                          deleting === prediction._id
-                            ? 'bg-gray-100 cursor-not-allowed'
-                            : 'hover:bg-red-50 text-red-600 hover:text-red-700'
-                        }`}
-                        title="Delete prediction"
-                      >
-                        {deleting === prediction._id ? (
-                          <RefreshCw className="w-4 h-4 animate-spin" />
-                        ) : (
-                          <Trash2 className="w-4 h-4" />
-                        )}
-                      </button>
+                      
+                      {/* Timestamp */}
+                      <div className="flex items-center text-xs text-gray-500">
+                        <Calendar className="w-3 h-3 mr-1" />
+                        {formatDate(prediction.createdAt)}
+                      </div>
                     </div>
                   </div>
                 );

@@ -131,8 +131,8 @@ function App() {
             Predict Your Car's CO₂ Emissions
           </h2>
           <p className="text-xl text-blue-100 max-w-3xl mx-auto">
-            Use machine learning to estimate your vehicle's environmental impact based on engine specifications.
-            Get instant predictions and track your emission calculations.
+           This prediction is based on a machine learning model trained on real car data. 
+          Results are estimates and may vary from actual emissions.
           </p>
         </div>
 
