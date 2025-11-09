@@ -6,6 +6,7 @@ import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import predictionRoutes from './routes/predictionRoutes.js';
 import carRoutes from './routes/carRoutes.js';
+import adminRoutes from './routes/adminRoutes.js';
 
 // Load environment variables
 dotenv.config();
@@ -18,7 +19,7 @@ app.use(helmet({
   crossOriginResourcePolicy: { policy: "cross-origin" }
 }));
 
-// Rate limiting
+// Rate limiting - disabled for development
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
   max: 100, // Limit each IP to 100 requests per windowMs
@@ -30,15 +31,20 @@ const limiter = rateLimit({
   legacyHeaders: false,
 });
 
-app.use('/api/', limiter);
+// Only apply rate limiting in production
+if (process.env.NODE_ENV === 'production') {
+  app.use('/api/', limiter);
+}
 
 // CORS configuration
 const corsOptions = {
   origin: process.env.NODE_ENV === 'production' 
-    ? [process.env.FRONTEND_URL] // Production frontend URL
-    : ['http://localhost:3000', 'http://localhost:5173'], // Development URLs
+    ? [process.env.FRONTEND_URL, process.env.CORS_ORIGIN] // Production frontend URLs
+    : ['http://localhost:3000', 'http://localhost:5173', 'http://127.0.0.1:3000', 'http://127.0.0.1:5173'], // Development URLs
   credentials: true,
-  optionsSuccessStatus: 200
+  optionsSuccessStatus: 200,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
 };
 
 app.use(cors(corsOptions));
@@ -148,6 +154,7 @@ app.get('/', (req, res) => {
 // API routes
 app.use('/api', predictionRoutes);
 app.use('/api', carRoutes);
+app.use('/api', adminRoutes);
 
 // 404 handler
 app.use('*', (req, res) => {

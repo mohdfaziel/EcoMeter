@@ -18,7 +18,7 @@ import {
   Zap
 } from 'lucide-react';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:10000';
+const API_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:10000';
 
 // Simple chart components since we don't have chart.js yet
 const SimpleBarChart = ({ data, title }) => {
@@ -27,30 +27,62 @@ const SimpleBarChart = ({ data, title }) => {
   const maxValue = Math.max(...data.map(item => item.co2_gkm));
   
   return (
-    <div className="bg-white/10 backdrop-blur-md rounded-lg p-6">
-      <h3 className="text-lg font-semibold text-white mb-4 flex items-center">
+    <div className="bg-white/10 backdrop-blur-md rounded-lg p-4">
+      <h3 className="text-lg font-semibold text-white mb-3 flex items-center">
         <BarChart3 className="w-5 h-5 mr-2" />
         {title}
       </h3>
-      <div className="space-y-3">
-        {data.slice(0, 8).map((item, index) => (
-          <div key={index} className="flex items-center">
-            <div className="w-24 text-sm text-blue-100 truncate">
-              {item.model}
-            </div>
-            <div className="flex-1 mx-3">
-              <div className="bg-gray-700 rounded-full h-4 relative overflow-hidden">
-                <div 
-                  className="bg-gradient-to-r from-red-500 to-orange-500 h-full rounded-full transition-all duration-500"
-                  style={{ width: `${(item.co2_gkm / maxValue) * 100}%` }}
-                ></div>
+      
+      <div className="space-y-2">
+        {data.slice(0, 8).map((item, index) => {
+          const percentage = (item.co2_gkm / maxValue) * 100;
+          const isHigh = item.co2_gkm > (maxValue * 0.7);
+          
+          return (
+            <div key={index} className="flex items-center">
+              {/* Car name */}
+              <div className="w-24 text-xs text-blue-100 truncate">
+                {item.model}
+              </div>
+              
+              {/* Bar */}
+              <div className="flex-1 mx-2">
+                <div className="bg-gray-700 rounded h-4 relative overflow-hidden">
+                  <div 
+                    className={`h-full rounded transition-all duration-500 ${
+                      isHigh 
+                        ? 'bg-red-500' 
+                        : item.co2_gkm > (maxValue * 0.4)
+                        ? 'bg-yellow-500'
+                        : 'bg-green-500'
+                    }`}
+                    style={{ width: `${Math.max(percentage, 8)}%` }}
+                  ></div>
+                </div>
+              </div>
+              
+              {/* Value */}
+              <div className="w-12 text-xs text-white text-right">
+                {item.co2_gkm}g
               </div>
             </div>
-            <div className="w-16 text-sm text-white text-right">
-              {item.co2_gkm}g
-            </div>
+          );
+        })}
+      </div>
+      
+      {/* Simple legend */}
+      <div className="flex justify-center mt-3 pt-2 border-t border-white/10">
+        <div className="flex items-center space-x-3 text-xs text-blue-300">
+          <div className="flex items-center">
+            <div className="w-2 h-2 bg-green-500 rounded mr-1"></div>Low
           </div>
-        ))}
+          <div className="flex items-center">
+            <div className="w-2 h-2 bg-yellow-500 rounded mr-1"></div>Med
+          </div>
+          <div className="flex items-center">
+            <div className="w-2 h-2 bg-red-500 rounded mr-1"></div>High
+          </div>
+        </div>
       </div>
     </div>
   );
@@ -60,45 +92,74 @@ const SimpleScatterPlot = ({ data, title }) => {
   if (!data || data.length === 0) return null;
   
   const maxPrice = Math.max(...data.map(item => item.price_lakh));
+  const minPrice = Math.min(...data.map(item => item.price_lakh));
   const maxMileage = Math.max(...data.map(item => item.mileage_kmpl));
+  const minMileage = Math.min(...data.map(item => item.mileage_kmpl));
+  
+  const priceRange = maxPrice - minPrice;
+  const mileageRange = maxMileage - minMileage;
   
   return (
-    <div className="bg-white/10 backdrop-blur-md rounded-lg p-6">
-      <h3 className="text-lg font-semibold text-white mb-4 flex items-center">
+    <div className="bg-white/10 backdrop-blur-md rounded-lg p-4">
+      <h3 className="text-lg font-semibold text-white mb-3 flex items-center">
         <TrendingUp className="w-5 h-5 mr-2" />
         {title}
       </h3>
-      <div className="relative h-64 bg-gray-800/50 rounded-lg p-4">
-        {/* Y-axis label */}
-        <div className="absolute -left-4 top-0 bottom-0 flex items-center">
-          <span className="text-xs text-blue-200 transform -rotate-90 whitespace-nowrap">
-            Mileage (km/l)
-          </span>
-        </div>
-        
-        {/* X-axis label */}
-        <div className="absolute -bottom-8 left-0 right-0 text-center">
-          <span className="text-xs text-blue-200">Price (₹ Lakh)</span>
-        </div>
-        
-        {/* Data points */}
-        <div className="relative w-full h-full">
-          {data.slice(0, 15).map((item, index) => (
-            <div
-              key={index}
-              className="absolute w-3 h-3 bg-blue-500 rounded-full border-2 border-white hover:scale-150 transition-transform cursor-pointer group"
-              style={{
-                left: `${(item.price_lakh / maxPrice) * 90}%`,
-                bottom: `${(item.mileage_kmpl / maxMileage) * 90}%`
-              }}
-              title={`${item.make} ${item.model}`}
-            >
-              <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-black text-white text-xs p-1 rounded opacity-0 group-hover:opacity-100 whitespace-nowrap pointer-events-none z-10">
-                {item.make} {item.model}<br />
-                ₹{item.price_lakh}L | {item.mileage_kmpl}km/l
+      <div className="relative h-64 bg-gray-800/50 rounded-lg overflow-hidden">
+        {/* Chart container with padding */}
+        <div className="absolute inset-0 p-8">
+          
+          {/* Y-axis values */}
+          <div className="absolute left-0 top-8 bottom-8 w-8 flex flex-col justify-between">
+            {[maxMileage, (maxMileage + minMileage) / 2, minMileage].map((value, i) => (
+              <div key={i} className="text-xs text-blue-200 text-right">
+                {Math.round(value)}
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
+          
+          {/* X-axis values */}
+          <div className="absolute left-8 right-2 bottom-0 h-6 flex justify-between items-end">
+            {[minPrice, (maxPrice + minPrice) / 2, maxPrice].map((value, i) => (
+              <div key={i} className="text-xs text-blue-200">
+                ₹{Math.round(value)}L
+              </div>
+            ))}
+          </div>
+          
+          {/* Chart area */}
+          <div className="absolute left-8 right-2 top-8 bottom-6">
+            {/* Grid */}
+            <div className="absolute inset-0 border-l border-b border-blue-600/30"></div>
+            
+            {/* Data points */}
+            {data.slice(0, 15).map((item, index) => {
+              const x = ((item.price_lakh - minPrice) / priceRange) * 100;
+              const y = 100 - ((item.mileage_kmpl - minMileage) / mileageRange) * 100;
+              
+              return (
+                <div
+                  key={index}
+                  className="absolute w-3 h-3 bg-blue-500 rounded-full border border-white hover:scale-125 transition-transform cursor-pointer group"
+                  style={{
+                    left: `${x}%`,
+                    top: `${y}%`,
+                    transform: 'translate(-50%, -50%)'
+                  }}
+                  title={`${item.make} ${item.model} - ₹${item.price_lakh}L, ${item.mileage_kmpl}km/l`}
+                >
+                </div>
+              );
+            })}
+          </div>
+          
+          {/* Labels */}
+          <div className="absolute left-1 top-1/2 transform -rotate-90 text-xs text-blue-200">
+            Mileage (km/l)
+          </div>
+          <div className="absolute bottom-1 left-1/2 transform -translate-x-1/2 text-xs text-blue-200">
+            Price (₹ Lakh)
+          </div>
         </div>
       </div>
     </div>
@@ -317,11 +378,11 @@ const CarRankings = () => {
               <select
                 value={filters.fuelType}
                 onChange={(e) => handleFilterChange('fuelType', e.target.value)}
-                className="w-full p-2 bg-white/20 border border-white/30 rounded-lg text-white focus:outline-none focus:border-blue-400"
+                className="w-full p-2 bg-white/20 border border-white/30 rounded-lg text-white focus:outline-none focus:border-blue-400 [&>option]:bg-gray-800 [&>option]:text-white"
               >
-                <option value="all">All Types</option>
+                <option value="all" className="bg-gray-800 text-white">All Types</option>
                 {availableFilters.fuelTypes.map(type => (
-                  <option key={type} value={type}>{type}</option>
+                  <option key={type} value={type} className="bg-gray-800 text-white">{type}</option>
                 ))}
               </select>
             </div>
@@ -332,11 +393,11 @@ const CarRankings = () => {
               <select
                 value={filters.make}
                 onChange={(e) => handleFilterChange('make', e.target.value)}
-                className="w-full p-2 bg-white/20 border border-white/30 rounded-lg text-white focus:outline-none focus:border-blue-400"
+                className="w-full p-2 bg-white/20 border border-white/30 rounded-lg text-white focus:outline-none focus:border-blue-400 [&>option]:bg-gray-800 [&>option]:text-white"
               >
-                <option value="all">All Makes</option>
+                <option value="all" className="bg-gray-800 text-white">All Makes</option>
                 {availableFilters.makes.map(make => (
-                  <option key={make} value={make}>{make}</option>
+                  <option key={make} value={make} className="bg-gray-800 text-white">{make}</option>
                 ))}
               </select>
             </div>
@@ -347,14 +408,14 @@ const CarRankings = () => {
               <select
                 value={filters.sortBy}
                 onChange={(e) => handleFilterChange('sortBy', e.target.value)}
-                className="w-full p-2 bg-white/20 border border-white/30 rounded-lg text-white focus:outline-none focus:border-blue-400"
+                className="w-full p-2 bg-white/20 border border-white/30 rounded-lg text-white focus:outline-none focus:border-blue-400 [&>option]:bg-gray-800 [&>option]:text-white"
               >
-                <option value="score">Rank (Score)</option>
-                <option value="co2_gkm">CO₂ Emissions</option>
-                <option value="price_lakh">Price</option>
-                <option value="mileage_kmpl">Mileage</option>
-                <option value="comfort_rating">Comfort</option>
-                <option value="space_rating">Space</option>
+                <option value="score" className="bg-gray-800 text-white">Rank (Score)</option>
+                <option value="co2_gkm" className="bg-gray-800 text-white">CO₂ Emissions</option>
+                <option value="price_lakh" className="bg-gray-800 text-white">Price</option>
+                <option value="mileage_kmpl" className="bg-gray-800 text-white">Mileage</option>
+                <option value="comfort_rating" className="bg-gray-800 text-white">Comfort</option>
+                <option value="space_rating" className="bg-gray-800 text-white">Space</option>
               </select>
             </div>
 
@@ -528,17 +589,10 @@ const CarRankings = () => {
           {/* Charts */}
           <div className="space-y-8">
             {stats && (
-              <>
-                <SimpleBarChart 
-                  data={stats.co2Emissions} 
-                  title="CO₂ Emissions by Model" 
-                />
-                
-                <SimpleScatterPlot 
-                  data={stats.mileagePrice} 
-                  title="Mileage vs Price" 
-                />
-              </>
+              <SimpleBarChart 
+                data={stats.co2Emissions} 
+                title="CO₂ Emissions by Model" 
+              />
             )}
           </div>
         </div>

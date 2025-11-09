@@ -169,14 +169,14 @@ const PredictionForm = ({ onPredictionComplete }) => {
             name="cylinders"
             value={formData.cylinders}
             onChange={handleChange}
-            className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+            className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 [&>option]:bg-gray-800 [&>option]:text-white ${
               errors.cylinders ? 'border-red-500' : 'border-gray-300'
             }`}
             disabled={loading}
           >
-            <option value="">Select cylinders</option>
+            <option value="" className="bg-gray-800 text-white">Select cylinders</option>
             {[3, 4, 5, 6, 8, 10, 12, 16].map(num => (
-              <option key={num} value={num}>{num} cylinders</option>
+              <option key={num} value={num} className="bg-gray-800 text-white">{num} cylinders</option>
             ))}
           </select>
           {errors.cylinders && (
