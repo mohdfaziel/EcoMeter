@@ -681,7 +681,7 @@ const AdminDashboard = () => {
         const adminData = JSON.parse(adminInfoStr);
         setAdminInfo(adminData);
         setIsAuthenticated(true);
-        fetchCars();
+        // Don't call fetchCars here - it will be called by the separate useEffect
       } catch (error) {
         console.error('Error parsing admin info:', error);
         handleLogout();
@@ -691,21 +691,37 @@ const AdminDashboard = () => {
     }
   }, []);
 
+  // Fetch cars when authenticated
+  useEffect(() => {
+    if (isAuthenticated) {
+      fetchCars();
+    }
+  }, [isAuthenticated]);
+
   const fetchCars = async () => {
     setLoading(true);
     try {
+      console.log('🚗 Fetching cars from API...');
       const response = await fetch(`${API_URL}/api/cars?limit=1000&sortBy=score&sortOrder=desc`);
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
       const data = await response.json();
+      console.log('📊 API Response:', data);
       
       if (data.success) {
-        setCars(data.data);
-        toast.success(`Loaded ${data.data.length} cars from database`);
+        setCars(data.data || []);
+        console.log(`✅ Loaded ${data.data?.length || 0} cars`);
+        toast.success(`Loaded ${data.data?.length || 0} cars from database`);
       } else {
-        throw new Error(data.error || 'Failed to fetch cars');
+        throw new Error(data.error || data.message || 'Failed to fetch cars');
       }
     } catch (error) {
-      console.error('Error fetching cars:', error);
-      toast.error('Failed to load cars');
+      console.error('❌ Error fetching cars:', error);
+      toast.error(`Failed to load cars: ${error.message}`);
+      setCars([]); // Set empty array on error
     } finally {
       setLoading(false);
     }
