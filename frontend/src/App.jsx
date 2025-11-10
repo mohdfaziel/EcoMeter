@@ -43,7 +43,7 @@ const HomePage = () => {
         <h2 className="text-2xl md:text-4xl font-bold text-white mb-4">
           Predict Your Car's CO₂ Emissions
         </h2>
-        <p className="text-lg md:text-xl text-blue-100 max-w-3xl mx-auto">
+        <p className="text-lg md:text-xl text-slate-300 max-w-3xl mx-auto">
          This prediction is based on a machine learning model trained on real car data. 
         Results are estimates and may vary from actual emissions.
         </p>
@@ -52,12 +52,12 @@ const HomePage = () => {
       {/* Latest Prediction Display */}
       {lastPrediction && (
         <div className="mb-8">
-          <div className="bg-green-500/20 backdrop-blur-md border border-green-500/30 rounded-lg p-6 text-center">
+          <div className="bg-yellow-500/20 backdrop-blur-md border border-yellow-500/30 rounded-lg p-6 text-center">
             <h3 className="text-lg font-semibold text-white mb-2">Latest Prediction</h3>
-            <div className="text-2xl md:text-3xl font-bold text-green-300 mb-2">
+            <div className="text-2xl md:text-3xl font-bold text-yellow-300 mb-2">
               {lastPrediction.formattedPrediction}
             </div>
-            <p className="text-green-100 text-sm">
+            <p className="text-yellow-100 text-sm">
               Engine: {lastPrediction.input.engineSize}L • 
               Cylinders: {lastPrediction.input.cylinders} • 
               Fuel: {lastPrediction.input.fuelConsumption}L/100km
@@ -81,26 +81,26 @@ const HomePage = () => {
 
       {/* Features Section */}
       <div className="mt-16 grid grid-cols-1 md:grid-cols-3 gap-8">
-        <div className="bg-white/10 backdrop-blur-md rounded-lg p-6 text-center">
-          <Zap className="mx-auto mb-4 text-yellow-400" size={48} />
+        <div className="bg-slate-800/50 backdrop-blur-md rounded-lg p-6 text-center">
+          <Zap className="mx-auto mb-4 text-yellow-300" size={48} />
           <h3 className="text-lg font-semibold text-white mb-2">Instant Predictions</h3>
-          <p className="text-blue-100 text-sm">
+          <p className="text-slate-300 text-sm">
             Get CO₂ emission predictions in seconds using our trained machine learning model.
           </p>
         </div>
         
-        <div className="bg-white/10 backdrop-blur-md rounded-lg p-6 text-center">
-          <Database className="mx-auto mb-4 text-blue-400" size={48} />
+        <div className="bg-slate-800/50 backdrop-blur-md rounded-lg p-6 text-center">
+          <Database className="mx-auto mb-4 text-blue-300" size={48} />
           <h3 className="text-lg font-semibold text-white mb-2">Prediction History</h3>
-          <p className="text-blue-100 text-sm">
+          <p className="text-slate-300 text-sm">
             Track all your predictions with detailed history and the ability to compare results.
           </p>
         </div>
         
-        <div className="bg-white/10 backdrop-blur-md rounded-lg p-6 text-center">
-          <Leaf className="mx-auto mb-4 text-green-400" size={48} />
+        <div className="bg-slate-800/50 backdrop-blur-md rounded-lg p-6 text-center">
+          <Leaf className="mx-auto mb-4 text-green-300" size={48} />
           <h3 className="text-lg font-semibold text-white mb-2">Environmental Impact</h3>
-          <p className="text-blue-100 text-sm">
+          <p className="text-slate-300 text-sm">
             Make informed decisions about your vehicle's environmental footprint.
           </p>
         </div>
@@ -127,17 +127,17 @@ const Navigation = ({ backendStatus, showStatusTooltip, setShowStatusTooltip, ge
   };
 
   return (
-    <header className="bg-white/10 backdrop-blur-md border-b border-white/20 sticky top-0 z-40">
+    <header className="bg-slate-900/90 backdrop-blur-md border-b border-slate-600/30 sticky top-0 z-40">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between py-4">
           {/* Logo and Brand */}
           <Link to="/" className="flex items-center space-x-3 hover:opacity-80 transition-opacity">
-            <div className="p-2 bg-green-500 rounded-lg">
+            <div className="p-2 bg-blue-500 rounded-lg">
               <Leaf className="w-6 h-6 text-white" />
             </div>
             <div>
               <h1 className="text-xl font-bold text-white">EcoMeter</h1>
-              <p className="text-sm text-blue-100">Car CO₂ Emissions Predictor</p>
+              <p className="text-sm text-slate-300">Car CO₂ Emissions Predictor</p>
             </div>
           </Link>
 
@@ -149,8 +149,8 @@ const Navigation = ({ backendStatus, showStatusTooltip, setShowStatusTooltip, ge
                 to={path}
                 className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-colors ${
                   isActivePage(path)
-                    ? 'bg-white/20 text-white'
-                    : 'text-blue-100 hover:text-white hover:bg-white/10'
+                    ? 'bg-yellow-500/20 text-yellow-200 border border-yellow-500/30'
+                    : 'text-slate-300 hover:text-white hover:bg-slate-700/50'
                 }`}
               >
                 <Icon className="w-4 h-4" />
@@ -166,7 +166,7 @@ const Navigation = ({ backendStatus, showStatusTooltip, setShowStatusTooltip, ge
             {/* Mobile Menu Button */}
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="md:hidden text-white hover:text-blue-200 transition-colors"
+              className="md:hidden text-white hover:text-yellow-300 transition-colors"
             >
               {isMobileMenuOpen ? (
                 <XCircle className="w-6 h-6" />
@@ -179,7 +179,7 @@ const Navigation = ({ backendStatus, showStatusTooltip, setShowStatusTooltip, ge
 
         {/* Mobile Navigation */}
         {isMobileMenuOpen && (
-          <nav className="md:hidden pb-4 border-t border-white/20 mt-4 pt-4">
+          <nav className="md:hidden pb-4 border-t border-slate-600/30 mt-4 pt-4">
             <div className="space-y-2">
               {navItems.map(({ path, label, icon: Icon }) => (
                 <Link
@@ -188,8 +188,8 @@ const Navigation = ({ backendStatus, showStatusTooltip, setShowStatusTooltip, ge
                   onClick={() => setIsMobileMenuOpen(false)}
                   className={`flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors ${
                     isActivePage(path)
-                      ? 'bg-white/20 text-white'
-                      : 'text-blue-100 hover:text-white hover:bg-white/10'
+                      ? 'bg-yellow-500/20 text-yellow-200 border border-yellow-500/30'
+                      : 'text-slate-300 hover:text-white hover:bg-slate-700/50'
                   }`}
                 >
                   <Icon className="w-5 h-5" />
@@ -282,7 +282,7 @@ function App() {
 
   return (
     <Router>
-      <div className="min-h-screen bg-gradient-to-br from-blue-600 via-purple-600 to-blue-800">
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-700">
         {/* Navigation */}
         <Navigation 
           backendStatus={backendStatus}
@@ -301,18 +301,18 @@ function App() {
         </main>
 
         {/* Footer */}
-        <footer className="bg-white/5 backdrop-blur-md border-t border-white/20 mt-16">
+        <footer className="bg-slate-900/50 backdrop-blur-md border-t border-slate-600/30 mt-16">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
             <div className="flex flex-col md:flex-row items-center justify-between space-y-4 md:space-y-0">
               {/* Left side - Copyright and Description */}
               <div className="text-center md:text-left">
                 <div className="flex items-center justify-center md:justify-start space-x-2 mb-2">
-                  <div className="p-1 bg-green-500 rounded">
+                  <div className="p-1 bg-blue-500 rounded">
                     <Leaf className="w-4 h-4 text-white" />
                   </div>
                   <span className="text-white font-semibold">EcoMeter</span>
                 </div>
-                <p className="text-sm text-blue-100">
+                <p className="text-sm text-slate-300">
                   © 2025 EcoMeter. Helping you understand your vehicle's environmental impact.
                 </p>
               </div>
@@ -323,7 +323,7 @@ function App() {
                   href="https://faziel.vercel.app/"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-blue-100 hover:text-white transition-colors duration-200 p-2 hover:bg-white/10 rounded-lg"
+                  className="text-slate-300 hover:text-white transition-colors duration-200 p-2 hover:bg-slate-700/50 rounded-lg"
                   title="Developer Portfolio"
                 >
                   <User className="w-5 h-5" />

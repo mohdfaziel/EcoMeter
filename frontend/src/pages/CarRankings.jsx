@@ -27,9 +27,9 @@ const SimpleBarChart = ({ data, title }) => {
   const maxValue = Math.max(...data.map(item => item.co2_gkm));
   
   return (
-    <div className="bg-white/10 backdrop-blur-md rounded-lg p-4">
+    <div className="bg-slate-800/70 backdrop-blur-md rounded-lg p-4">
       <h3 className="text-lg font-semibold text-white mb-3 flex items-center">
-        <BarChart3 className="w-5 h-5 mr-2" />
+        <BarChart3 className="w-5 h-5 mr-2 text-yellow-400" />
         {title}
       </h3>
       
@@ -41,13 +41,13 @@ const SimpleBarChart = ({ data, title }) => {
           return (
             <div key={index} className="flex items-center">
               {/* Car name */}
-              <div className="w-24 text-xs text-blue-100 truncate">
+              <div className="w-24 text-xs text-slate-300 truncate">
                 {item.model}
               </div>
               
               {/* Bar */}
               <div className="flex-1 mx-2">
-                <div className="bg-gray-700 rounded h-4 relative overflow-hidden">
+                <div className="bg-slate-700 rounded h-4 relative overflow-hidden">
                   <div 
                     className={`h-full rounded transition-all duration-500 ${
                       isHigh 
@@ -102,7 +102,7 @@ const SimpleScatterPlot = ({ data, title }) => {
   return (
     <div className="bg-white/10 backdrop-blur-md rounded-lg p-4">
       <h3 className="text-lg font-semibold text-white mb-3 flex items-center">
-        <TrendingUp className="w-5 h-5 mr-2" />
+        <TrendingUp className="w-5 h-5 mr-2 text-red-300" />
         {title}
       </h3>
       <div className="relative h-64 bg-gray-800/50 rounded-lg overflow-hidden">
@@ -324,9 +324,9 @@ const CarRankings = () => {
 
   if (loading && cars.length === 0) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-600 via-purple-600 to-blue-800 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center">
         <div className="text-center">
-          <Loader2 className="w-12 h-12 text-white animate-spin mx-auto mb-4" />
+          <Loader2 className="w-12 h-12 text-yellow-400 animate-spin mx-auto mb-4" />
           <p className="text-white text-lg">Loading car rankings...</p>
         </div>
       </div>
@@ -334,15 +334,15 @@ const CarRankings = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-600 via-purple-600 to-blue-800 p-4">
+    <div className="min-h-screen p-4">
       {/* Header */}
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-8">
           <h1 className="text-3xl md:text-4xl font-bold text-white mb-4 flex items-center justify-center">
-            <Trophy className="w-8 h-8 mr-3 text-yellow-400" />
+            <Trophy className="w-8 h-8 mr-3 text-blue-300" />
             Car Rankings
           </h1>
-          <p className="text-lg text-blue-100 max-w-3xl mx-auto">
+          <p className="text-lg text-slate-300 max-w-3xl mx-auto">
             Discover the top-ranked cars in India based on our AI-calculated score that balances 
             CO₂ emissions, price, mileage, comfort, and space ratings.
           </p>
@@ -358,7 +358,7 @@ const CarRankings = () => {
           <div className="space-y-4">
             {/* Search - Full Width */}
             <div>
-              <label className="block text-sm text-blue-100 mb-1">Search</label>
+              <label className="block text-sm text-slate-300 mb-1">Search</label>
               <div className="relative">
                 <input
                   type="text"
@@ -368,7 +368,7 @@ const CarRankings = () => {
                   onKeyPress={handleSearch}
                   className="w-full pl-10 pr-4 py-2 bg-white/20 border border-white/30 rounded-lg text-white placeholder-blue-200 focus:outline-none focus:border-blue-400"
                 />
-                <Search className="absolute left-3 top-2.5 w-4 h-4 text-blue-200" />
+                <Search className="absolute left-3 top-2.5 w-4 h-4 text-slate-400" />
               </div>
             </div>
 
@@ -376,7 +376,7 @@ const CarRankings = () => {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
               {/* Fuel Type */}
               <div>
-                <label className="block text-sm text-blue-100 mb-1">Fuel Type</label>
+                <label className="block text-sm text-slate-300 mb-1">Fuel Type</label>
                 <select
                   value={filters.fuelType}
                   onChange={(e) => handleFilterChange('fuelType', e.target.value)}
@@ -391,7 +391,7 @@ const CarRankings = () => {
 
               {/* Make */}
               <div>
-                <label className="block text-sm text-blue-100 mb-1">Make</label>
+                <label className="block text-sm text-slate-300 mb-1">Make</label>
                 <select
                   value={filters.make}
                   onChange={(e) => handleFilterChange('make', e.target.value)}
@@ -406,7 +406,7 @@ const CarRankings = () => {
 
               {/* Sort By */}
               <div>
-                <label className="block text-sm text-blue-100 mb-1">Sort By</label>
+                <label className="block text-sm text-slate-300 mb-1">Sort By</label>
                 <select
                   value={filters.sortBy}
                   onChange={(e) => handleFilterChange('sortBy', e.target.value)}
@@ -423,7 +423,7 @@ const CarRankings = () => {
 
               {/* Sort Order */}
               <div>
-                <label className="block text-sm text-blue-100 mb-1">Order</label>
+                <label className="block text-sm text-slate-300 mb-1">Order</label>
                 <button
                   onClick={() => handleFilterChange('sortOrder', filters.sortOrder === 'desc' ? 'asc' : 'desc')}
                   className="w-full p-2 bg-white/20 border border-white/30 rounded-lg text-white flex items-center justify-center hover:bg-white/30 transition-colors"

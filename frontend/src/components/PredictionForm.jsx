@@ -213,13 +213,13 @@ const PredictionForm = ({ onPredictionComplete }) => {
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-lg p-3 md:p-6 max-w-md mx-auto md:h-[600px] flex flex-col">
+    <div className="bg-slate-800 rounded-lg shadow-lg p-3 md:p-6 max-w-md mx-auto md:h-[600px] flex flex-col">
       <div className="text-center mb-6">
-        <Car className="mx-auto mb-3 text-blue-600" size={48} />
-        <h2 className="text-2xl font-bold text-gray-800 mb-2">
+        <Car className="mx-auto mb-3 text-green-300" size={48} />
+        <h2 className="text-2xl font-bold text-white mb-2">
           CO₂ Prediction
         </h2>
-        <p className="text-gray-600 text-sm">
+        <p className="text-slate-300 text-sm">
           Enter your car's specifications to predict CO₂ emissions
         </p>
       </div>
@@ -230,7 +230,7 @@ const PredictionForm = ({ onPredictionComplete }) => {
           <div>
             <label
               htmlFor="engineSize"
-              className="block text-sm font-medium text-gray-700 mb-1"
+              className="block text-sm font-medium text-slate-300 mb-1"
             >
               <Zap className="inline w-4 h-4 mr-1" />
               Engine Size (L)
@@ -245,8 +245,8 @@ const PredictionForm = ({ onPredictionComplete }) => {
               min="0.1"
               max="20"
               placeholder="e.g., 2.5"
-              className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                errors.engineSize ? "border-red-500" : "border-gray-300"
+              className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500 bg-slate-700 text-white placeholder-slate-400 ${
+                errors.engineSize ? "border-red-500" : "border-slate-600"
               }`}
               disabled={loading}
             />
@@ -262,7 +262,7 @@ const PredictionForm = ({ onPredictionComplete }) => {
           <div>
             <label
               htmlFor="cylinders"
-              className="block text-sm font-medium text-gray-700 mb-1"
+              className="block text-sm font-medium text-slate-300 mb-1"
             >
               <Calculator className="inline w-4 h-4 mr-1" />
               Number of Cylinders
@@ -272,19 +272,19 @@ const PredictionForm = ({ onPredictionComplete }) => {
               name="cylinders"
               value={formData.cylinders}
               onChange={handleChange}
-              className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 [&>option]:bg-gray-800 [&>option]:text-white ${
-                errors.cylinders ? "border-red-500" : "border-gray-300"
+              className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500 bg-slate-700 text-white [&>option]:bg-slate-800 [&>option]:text-white ${
+                errors.cylinders ? "border-red-500" : "border-slate-600"
               }`}
               disabled={loading}
             >
-              <option value="" className="bg-gray-800 text-white">
+              <option value="" className="bg-slate-800 text-white">
                 Select cylinders
               </option>
               {[3, 4, 5, 6, 8, 10, 12, 16].map((num) => (
                 <option
                   key={num}
                   value={num}
-                  className="bg-gray-800 text-white"
+                  className="bg-slate-800 text-white"
                 >
                   {num} cylinders
                 </option>
@@ -302,7 +302,7 @@ const PredictionForm = ({ onPredictionComplete }) => {
           <div>
             <label
               htmlFor="fuelConsumption"
-              className="block text-sm font-medium text-gray-700 mb-1"
+              className="block text-sm font-medium text-slate-300 mb-1"
             >
               <Fuel className="inline w-4 h-4 mr-1" />
               Fuel Consumption (L/100km)
@@ -317,8 +317,8 @@ const PredictionForm = ({ onPredictionComplete }) => {
               min="0.1"
               max="50"
               placeholder="e.g., 9.5"
-              className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                errors.fuelConsumption ? "border-red-500" : "border-gray-300"
+              className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500 bg-slate-700 text-white placeholder-slate-400 ${
+                errors.fuelConsumption ? "border-red-500" : "border-slate-600"
               }`}
               disabled={loading}
             />
@@ -328,7 +328,7 @@ const PredictionForm = ({ onPredictionComplete }) => {
                 {errors.fuelConsumption}
               </p>
             )}
-            <p className="mt-1 text-xs text-gray-500">
+            <p className="mt-1 text-xs text-slate-400">
               Combined city/highway fuel consumption
             </p>
           </div>
@@ -343,8 +343,8 @@ const PredictionForm = ({ onPredictionComplete }) => {
             disabled={wakingUp || loading}
             className={`flex-1 py-3 px-4 rounded-md font-medium transition-all duration-200 ${
               wakingUp || loading
-                ? "bg-gray-400 cursor-not-allowed"
-                : "bg-green-600 hover:bg-green-700 focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
+                ? "bg-slate-600 cursor-not-allowed"
+                : "bg-yellow-600 hover:bg-yellow-700 focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2"
             } text-white`}
           >
             {wakingUp ? (
@@ -372,8 +372,8 @@ const PredictionForm = ({ onPredictionComplete }) => {
             disabled={loading || wakingUp}
             className={`flex-1 py-3 px-4 rounded-md font-medium transition-all duration-200 ${
               loading || wakingUp
-                ? "bg-gray-400 cursor-not-allowed"
-                : "bg-blue-600 hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                ? "bg-slate-600 cursor-not-allowed"
+                : "bg-slate-600 hover:bg-slate-500 focus:ring-2 focus:ring-slate-500 focus:ring-offset-2"
             } text-white`}
           >
             {loading ? (
@@ -392,9 +392,9 @@ const PredictionForm = ({ onPredictionComplete }) => {
       </form>
 
       {/* Info Text */}
-      <div className="mt-4 p-2 bg-blue-50 rounded-md">
+      <div className="mt-4 p-2 bg-yellow-500/20 border border-yellow-500/30 rounded-md">
         {!loading && !wakingUp && (
-          <p className="text-xs text-blue-600">
+          <p className="text-xs text-yellow-300">
             <strong>
               For your first prediction, please wake up the ML service using the
               Wake Up button.

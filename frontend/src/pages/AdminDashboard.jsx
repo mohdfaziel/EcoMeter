@@ -64,17 +64,17 @@ const AdminLogin = ({ onLogin }) => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-600 via-purple-600 to-blue-800 flex items-center justify-center p-4">
+    <div className="min-h-screen flex items-center justify-center p-4">
       <div className="bg-white/10 backdrop-blur-md rounded-lg p-8 w-full max-w-md">
         <div className="text-center mb-8">
           <Shield className="w-16 h-16 text-blue-300 mx-auto mb-4" />
           <h1 className="text-2xl font-bold text-white mb-2">Admin Access</h1>
-          <p className="text-blue-100">Enter your credentials to manage car data</p>
+          <p className="text-slate-300">Enter your credentials to manage car data</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
-            <label className="block text-sm text-blue-100 mb-2">Email</label>
+            <label className="block text-sm text-slate-300 mb-2">Email</label>
             <input
               type="email"
               required
@@ -86,7 +86,7 @@ const AdminLogin = ({ onLogin }) => {
           </div>
 
           <div>
-            <label className="block text-sm text-blue-100 mb-2">Password</label>
+            <label className="block text-sm text-slate-300 mb-2">Password</label>
             <div className="relative">
               <input
                 type={showPassword ? 'text' : 'password'}
@@ -99,7 +99,7 @@ const AdminLogin = ({ onLogin }) => {
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-3 text-blue-300 hover:text-white"
+                className="absolute right-3 top-3 text-slate-400 hover:text-white"
               >
                 {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
               </button>
@@ -109,7 +109,7 @@ const AdminLogin = ({ onLogin }) => {
           <button
             type="submit"
             disabled={loading}
-            className="w-full p-3 bg-blue-500 hover:bg-blue-600 disabled:opacity-50 rounded-lg text-white font-semibold transition-colors flex items-center justify-center"
+            className="w-full p-3 bg-yellow-600 hover:bg-yellow-700 disabled:opacity-50 rounded-lg text-white font-semibold transition-colors flex items-center justify-center"
           >
             {loading ? (
               <Loader2 className="w-5 h-5 animate-spin" />
@@ -805,7 +805,7 @@ const AdminDashboard = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-600 via-purple-600 to-blue-800 p-4">
+    <div className="min-h-screen p-4">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="bg-white/10 backdrop-blur-md rounded-lg p-4 sm:p-6 mb-8">

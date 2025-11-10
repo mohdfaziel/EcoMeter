@@ -115,32 +115,32 @@ const HistoryList = ({ refreshTrigger }) => {
 
   if (loading) {
     return (
-      <div className="bg-white rounded-lg shadow-lg p-6 h-[600px] flex flex-col">
+      <div className="bg-slate-800/80 backdrop-blur-md rounded-lg shadow-lg p-6 h-[600px] flex flex-col border border-slate-700">
         <div className="flex items-center justify-center flex-1">
-          <RefreshCw className="animate-spin mr-2" size={20} />
-          <span>Loading prediction history...</span>
+          <RefreshCw className="animate-spin mr-2 text-yellow-400" size={20} />
+          <span className="text-white">Loading prediction history...</span>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="bg-white rounded-lg shadow-lg p-3 md:p-6 h-[600px] flex flex-col">
+    <div className="bg-slate-800 rounded-lg shadow-lg p-3 md:p-6 h-[600px] flex flex-col">
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center">
-          <History className="mr-2 text-gray-600" size={24} />
-          <h2 className="text-xl font-bold text-gray-800">Prediction History</h2>
+          <History className="mr-2 text-red-300" size={24} />
+          <h2 className="text-xl font-bold text-white">Prediction History</h2>
         </div>
         <div className="hidden md:flex items-center space-x-2">
           <button
             onClick={() => loadPredictions()}
-            className="px-3 py-1 text-sm bg-gray-100 hover:bg-gray-200 rounded transition-colors duration-200"
+            className="px-3 py-1 text-sm bg-slate-700 hover:bg-slate-600 text-slate-300 hover:text-white border border-slate-600 hover:border-slate-500 rounded transition-colors duration-200"
             disabled={loading}
           >
             <RefreshCw className="w-4 h-4" />
           </button>
-          <span className="text-sm text-gray-500">
+          <span className="text-sm text-slate-300">
             {predictions.length} predictions
           </span>
         </div>
@@ -149,16 +149,16 @@ const HistoryList = ({ refreshTrigger }) => {
       {/* Empty State */}
       {predictions.length === 0 ? (
         <div className="text-center py-8">
-          <Car className="mx-auto mb-4 text-gray-400" size={48} />
-          <h3 className="text-lg font-medium text-gray-800 mb-2">No predictions yet</h3>
-          <p className="text-gray-600">
+          <Car className="mx-auto mb-4 text-slate-400" size={48} />
+          <h3 className="text-lg font-medium text-white mb-2">No predictions yet</h3>
+          <p className="text-slate-300">
             Make your first CO₂ emission prediction to see it here!
           </p>
         </div>
       ) : (
         <>
           {/* Predictions List - Fixed height with scrolling */}
-          <div className="flex-1 overflow-y-auto border border-gray-200 rounded-lg bg-gray-50">
+          <div className="flex-1 overflow-y-auto border border-slate-600 rounded-lg bg-slate-900/50 prediction-history-scroll">
             <div className="space-y-3 p-3">
               {predictions.map((prediction) => {
                 const category = getEmissionCategory(prediction.prediction);
@@ -166,15 +166,15 @@ const HistoryList = ({ refreshTrigger }) => {
                 return (
                   <div
                     key={prediction._id}
-                    className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow duration-200 bg-white"
+                    className="border border-slate-600 rounded-lg p-4 hover:shadow-md transition-shadow duration-200 bg-slate-700"
                   >
                     {/* Mobile-first layout */}
                     <div className="space-y-3">
                       {/* Header with CO2 and Delete Button */}
                       <div className="flex items-center justify-between">
                         <div className="flex items-center flex-wrap gap-2">
-                          <TrendingUp className="w-4 h-4 text-gray-500" />
-                          <span className="font-bold text-lg text-gray-800">
+                          <TrendingUp className="w-4 h-4 text-yellow-400" />
+                          <span className="font-bold text-lg text-white">
                             {prediction.prediction.toFixed(1)} g CO₂/km
                           </span>
                           <span className={`px-2 py-1 text-xs font-medium rounded-full ${category.color}`}>
@@ -187,8 +187,8 @@ const HistoryList = ({ refreshTrigger }) => {
                           disabled={deleting === prediction._id}
                           className={`p-2 rounded-md transition-colors duration-200 ${
                             deleting === prediction._id
-                              ? 'bg-gray-100 cursor-not-allowed'
-                              : 'hover:bg-red-50 text-red-600 hover:text-red-700'
+                              ? 'bg-slate-600 cursor-not-allowed text-slate-400'
+                              : 'hover:bg-red-500/20 text-slate-400 hover:text-red-400 border border-slate-600 hover:border-red-500/50'
                           }`}
                           title="Delete prediction"
                         >
@@ -201,7 +201,7 @@ const HistoryList = ({ refreshTrigger }) => {
                       </div>
                       
                       {/* Car Specifications - Mobile Responsive */}
-                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-4 text-sm text-gray-600">
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-4 text-sm text-slate-300">
                         <div className="flex justify-between sm:block">
                           <span className="font-medium">Engine:</span>
                           <span>{prediction.engineSize}L</span>
@@ -217,7 +217,7 @@ const HistoryList = ({ refreshTrigger }) => {
                       </div>
                       
                       {/* Timestamp */}
-                      <div className="flex items-center text-xs text-gray-500">
+                      <div className="flex items-center text-xs text-slate-400">
                         <Calendar className="w-3 h-3 mr-1" />
                         {formatDate(prediction.createdAt)}
                       </div>
