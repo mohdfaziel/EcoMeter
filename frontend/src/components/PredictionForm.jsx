@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Car, Zap, Fuel, Calculator, AlertCircle } from 'lucide-react';
+import { Car, Zap, Fuel, Calculator, AlertCircle, Power } from 'lucide-react';
 import { toast } from 'react-toastify';
 import { predictionAPI } from '../services/api';
 
@@ -11,6 +11,7 @@ const PredictionForm = ({ onPredictionComplete }) => {
   });
   
   const [loading, setLoading] = useState(false);
+  const [wakingUp, setWakingUp] = useState(false);
   const [errors, setErrors] = useState({});
 
   // Handle input changes
@@ -103,8 +104,8 @@ const PredictionForm = ({ onPredictionComplete }) => {
     } catch (error) {
       console.error('❌ Prediction error:', error);
       
-      if (error.status === 503) {
-        toast.error('ML service is temporarily unavailable. Please try again later.');
+      if (error.status === 503 || error.message?.includes('timeout') || error.message?.includes('inactive')) {
+        toast.error('The ML service is currently inactive. Please press the Wake Up button to start the service.');
       } else if (error.status === 400) {
         toast.error('Invalid input data. Please check your values.');
       } else {
@@ -115,7 +116,72 @@ const PredictionForm = ({ onPredictionComplete }) => {
     }
   };
 
-
+  // Handle Wake Up ML Server
+  const handleWakeUpML = async () => {
+    setWakingUp(true);
+    
+    try {
+      // Get ML service URL from environment variables
+      const mlServiceUrl = import.meta.env.VITE_ML_SERVICE_URL;
+      
+      // Record start time for measuring response duration
+      const startTime = Date.now();
+      
+      // Send request to wake up ML server with a reasonable timeout
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 15000); // 15 seconds timeout
+      
+      const response = await fetch(mlServiceUrl, {
+        method: 'GET',
+        signal: controller.signal,
+      });
+      
+      clearTimeout(timeoutId);
+      
+      // Calculate response duration
+      const responseDuration = Date.now() - startTime;
+      console.log(`ML Service response time: ${responseDuration}ms`);
+      
+      if (response.ok) {
+        // Try to read the response to get more information
+        let responseText = '';
+        try {
+          responseText = await response.text();
+        } catch (e) {
+          // Ignore text parsing errors
+        }
+        
+        // If response is very fast (< 3 seconds), service was likely already running
+        // Also check if response contains typical running service indicators
+        if (responseDuration < 3000 || responseText.includes('FastAPI') || responseText.includes('docs') || responseText.includes('openapi')) {
+          toast.success('ML services are already running and ready for predictions!');
+        } else {
+          toast.success('The ML server is waking up. Please wait a moment before predicting again.');
+        }
+      } else if (response.status === 503) {
+        // Service unavailable - needs to wake up
+        toast.info('Wake up request sent. The ML server should be ready shortly.');
+      } else {
+        // Other status codes - check if it's actually running but different endpoint
+        toast.success('ML services are already running and ready for predictions!');
+      }
+    } catch (error) {
+      console.error('Wake up request error:', error);
+      
+      if (error.name === 'AbortError') {
+        // Request timed out - service is likely sleeping
+        toast.info('The ML server is starting up. Please wait a moment before predicting again.');
+      } else if (error.message?.includes('fetch')) {
+        // Network error - service might be sleeping
+        toast.info('Wake up request sent. The ML server should be ready shortly.');
+      } else {
+        // Other errors - still send wake up message
+        toast.info('Wake up request sent. The ML server should be ready shortly.');
+      }
+    } finally {
+      setWakingUp(false);
+    }
+  };
 
   return (
     <div className="bg-white rounded-lg shadow-lg p-3 md:p-6 max-w-md mx-auto md:h-[600px] flex flex-col">
@@ -221,32 +287,62 @@ const PredictionForm = ({ onPredictionComplete }) => {
 
         </div>
         
-        {/* Submit Button */}
-        <button
-          type="submit"
-          disabled={loading}
-          className={`w-full py-3 px-4 rounded-md font-medium transition-all duration-200 mt-6 ${
-            loading
-              ? 'bg-gray-400 cursor-not-allowed'
-              : 'bg-blue-600 hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2'
-          } text-white`}
-        >
-          {loading ? (
-            <div className="flex items-center justify-center">
-              <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
-              Processing prediction...
-            </div>
-          ) : (
-            'Predict CO₂ Emissions'
-          )}
-        </button>
+        {/* Buttons Row */}
+        <div className="flex gap-3 mt-6">
+          {/* Wake Up ML Server Button */}
+          <button
+            type="button"
+            onClick={handleWakeUpML}
+            disabled={wakingUp || loading}
+            className={`flex-1 py-3 px-4 rounded-md font-medium transition-all duration-200 ${
+              wakingUp || loading
+                ? 'bg-gray-400 cursor-not-allowed'
+                : 'bg-green-600 hover:bg-green-700 focus:ring-2 focus:ring-green-500 focus:ring-offset-2'
+            } text-white`}
+          >
+            {wakingUp ? (
+              <div className="flex items-center justify-center">
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                Waking up...
+              </div>
+            ) : (
+              <div className="flex items-center justify-center">
+                <Power className="w-4 h-4 mr-2" />
+                Wake Up ML
+              </div>
+            )}
+          </button>
+
+          {/* Predict Button */}
+          <button
+            type="submit"
+            disabled={loading || wakingUp}
+            className={`flex-1 py-3 px-4 rounded-md font-medium transition-all duration-200 ${
+              loading || wakingUp
+                ? 'bg-gray-400 cursor-not-allowed'
+                : 'bg-blue-600 hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2'
+            } text-white`}
+          >
+            {loading ? (
+              <div className="flex items-center justify-center">
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                Predicting...
+              </div>
+            ) : (
+              <div className="flex items-center justify-center">
+                <Calculator className="w-4 h-4 mr-2" />
+                Predict CO₂
+              </div>
+            )}
+          </button>
+        </div>
       </form>
 
       {/* Info Text */}
       <div className="mt-4 p-2 bg-blue-50 rounded-md">
-        {!loading && (
+        {!loading && !wakingUp && (
           <p className="text-xs text-blue-600">
-            <strong>First prediction may take 30-45 seconds</strong> as the system initializes.
+            <strong>For your first prediction, please wake up the ML service using the Wake Up button.</strong>
           </p>
         )}
       </div>
