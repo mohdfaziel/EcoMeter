@@ -1,67 +1,86 @@
 # EcoMeter
 
-Machine learning web application that predicts vehicle CO₂ emissions based on engine specifications.
+AI-powered CO₂ emissions prediction platform with comprehensive vehicle database management and intelligent ML service integration.
 
 ## Features
 
-- Real-time CO₂ emissions prediction
-- Prediction history tracking
-- Responsive web interface
-- RESTful API with MongoDB storage
+- **ML Prediction Engine** - Real-time CO₂ emissions forecasting with smart server wake-up
+- **Car Database** - 1000+ vehicle rankings with AI-powered scoring system  
+- **Admin Dashboard** - Complete CRUD operations with authentication and analytics
+- **Prediction History** - Track and manage previous calculations
+- **Responsive Design** - Mobile-first interface with modern UI/UX
 
-## Tech Stack
+## Architecture
 
-**Frontend:** React, Vite, Tailwind CSS  
-**Backend:** Node.js, Express, MongoDB  
-**ML Service:** Python, FastAPI, scikit-learn  
-**Deployment:** Vercel, Render, MongoDB Atlas
+**Frontend:** React 18, Vite, Tailwind CSS, React Router  
+**Backend:** Node.js, Express, MongoDB Atlas, JWT Authentication  
+**ML Service:** Python, FastAPI, scikit-learn, Uvicorn  
+**Infrastructure:** Render (Backend/ML), Vercel (Frontend)
 
 ## Quick Start
 
 ```bash
-# Clone repository
+# Clone and setup
 git clone https://github.com/mohdfaziel/EcoMeter.git
 cd EcoMeter
 
-# Install dependencies
-cd backend && npm install
-cd ../frontend && npm install  
-cd ../ml-service && pip install -r requirements.txt
+# Install dependencies and start all services
+npm run start
 
-# Start services (3 terminals)
-cd ml-service && python start.py     # Port 8001
-cd backend && npm run dev            # Port 10000
-cd frontend && npm run dev           # Port 3000
+# Or start individually:
+npm run start:frontend  # http://localhost:3000
+npm run start:backend   # http://localhost:10000  
+npm run start:ml        # http://localhost:8003
 ```
 
-## API Usage
+## Environment Setup
 
-**Predict CO₂ Emissions:**
+Create `.env` files in frontend directory:
+
+```bash
+# Frontend/.env
+VITE_BACKEND_URL=http://localhost:10000
+VITE_ML_SERVICE_URL=###################
+```
+
+## API Documentation
+
+**Predict Emissions:**
 ```bash
 POST /api/predict
 {
-  "engineSize": 3.5,
-  "cylinders": 6,
-  "fuelConsumption": 10.0
+  "engineSize": 2.5,
+  "cylinders": 4,
+  "fuelConsumption": 8.5
 }
 ```
 
-**Get History:**
+**Car Database:**
 ```bash
-GET /api/history?page=1&limit=20
+GET /api/cars?sortBy=score&limit=50    # Get ranked cars
+POST /api/cars                         # Add new car (Admin)
+PUT /api/cars/:model                   # Update car (Admin)
+DELETE /api/cars/:model                # Delete car (Admin)
 ```
 
-## Machine Learning Model
+**Admin Authentication:**
+```bash
+POST /api/admin/login                  # Admin login
+PUT /api/admin/change-password         # Update credentials
+```
 
-- **Algorithm:** Linear Regression with StandardScaler
-- **Accuracy:** 87.6% R² score
-- **Dataset:** Government of Canada Fuel Consumption (1,067 records)
-- **Features:** Engine Size, Cylinders, Fuel Consumption
+## ML Model Performance
+
+- **Algorithm:** Linear Regression with StandardScaler preprocessing
+- **Accuracy:** 87.6% R² score on test data
+- **Dataset:** Government of Canada Fuel Consumption (1,067 vehicles)
+- **Features:** Engine displacement, cylinder count, fuel consumption
+- **Deployment:** Auto-scaling FastAPI service on Render
 
 ## Contributing
 
-1. Fork the repository
-2. Create feature branch: `git checkout -b feature/name`
-3. Commit changes: `git commit -m 'Add feature'`
-4. Push branch: `git push origin feature/name`
-5. Submit pull request
+1. Fork repository
+2. Create feature branch: `git checkout -b feature/enhancement`  
+3. Commit changes: `git commit -m 'Add new feature'`
+4. Push to branch: `git push origin feature/enhancement`
+5. Create Pull Request
