@@ -414,13 +414,11 @@ const PredictionForm = ({ onPredictionComplete }) => {
 
       {/* Info Text */}
       <div className="mt-4 p-2 bg-yellow-500/20 border border-yellow-500/30 rounded-md">
-        {!loading && !wakingUp && (
           <p className="text-xs text-yellow-300">
             <strong>
               Backend services may be sleeping. Please use the Wake Up button before making your first prediction.
             </strong>
           </p>
-        )}
       </div>
     </div>
   );
