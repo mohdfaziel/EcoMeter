@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Link, useLocation } from 'react
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { Analytics } from "@vercel/analytics/react";
+import logoImage from './assets/logo.png';
 import { 
   Leaf, 
   AlertTriangle, 
@@ -133,8 +134,8 @@ const Navigation = ({ backendStatus, showStatusTooltip, setShowStatusTooltip, ge
         <div className="flex items-center justify-between py-4">
           {/* Logo and Brand */}
           <Link to="/" className="flex items-center space-x-3 hover:opacity-80 transition-opacity">
-            <div className="p-2 bg-blue-500 rounded-lg">
-              <Leaf className="w-6 h-6 text-white" />
+            <div className="w-12 h-12 bg-blue-500 rounded-lg overflow-hidden">
+              <img src={logoImage} alt="EcoMeter Logo" className="w-full h-full" />
             </div>
             <div>
               <h1 className="text-xl font-bold text-white">EcoMeter</h1>
@@ -308,8 +309,8 @@ function App() {
               {/* Left side - Copyright and Description */}
               <div className="text-center md:text-left">
                 <div className="flex items-center justify-center md:justify-start space-x-2 mb-2">
-                  <div className="p-1 bg-blue-500 rounded">
-                    <Leaf className="w-4 h-4 text-white" />
+                  <div className="w-8 h-8 bg-blue-500 rounded overflow-hidden">
+                    <img src={logoImage} alt="EcoMeter Logo" className="w-full h-full" />
                   </div>
                   <span className="text-white font-semibold">EcoMeter</span>
                 </div>
