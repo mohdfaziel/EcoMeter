@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link, useLocation } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { Analytics } from "@vercel/analytics/react";
 import { 
   Leaf, 
   AlertTriangle, 
@@ -347,6 +348,7 @@ function App() {
           theme="light"
         />
       </div>
+      <Analytics />
     </Router>
   );
 }
