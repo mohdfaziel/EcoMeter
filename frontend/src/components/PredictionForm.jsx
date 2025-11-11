@@ -126,87 +126,108 @@ const PredictionForm = ({ onPredictionComplete }) => {
     }
   };
 
-  // Handle Wake Up ML Server
+  // Handle Wake Up ML Server and Backend
   const handleWakeUpML = async () => {
     setWakingUp(true);
 
     try {
-      // Get ML service URL from environment variables
+      // Get service URLs from environment variables
       const mlServiceUrl = import.meta.env.VITE_ML_SERVICE_URL;
+      const backendProductionUrl = import.meta.env.VITE_BACKEND_PRODUCTION_URL;
+
+      // Wake up both services in parallel
+      const wakeUpPromises = [];
+
+      // Wake up ML service
+      if (mlServiceUrl) {
+        const mlController = new AbortController();
+        const mlTimeoutId = setTimeout(() => mlController.abort(), 15000);
+        
+        wakeUpPromises.push(
+          fetch(mlServiceUrl, {
+            method: "GET",
+            signal: mlController.signal,
+          }).then(response => {
+            clearTimeout(mlTimeoutId);
+            return { service: 'ML', response, duration: Date.now() - Date.now() };
+          }).catch(error => ({ service: 'ML', error }))
+        );
+      }
+
+      // Wake up backend service
+      if (backendProductionUrl) {
+        const backendController = new AbortController();
+        const backendTimeoutId = setTimeout(() => backendController.abort(), 15000);
+        
+        wakeUpPromises.push(
+          fetch(backendProductionUrl, {
+            method: "GET",
+            signal: backendController.signal,
+          }).then(response => {
+            clearTimeout(backendTimeoutId);
+            return { service: 'Backend', response, duration: Date.now() - Date.now() };
+          }).catch(error => ({ service: 'Backend', error }))
+        );
+      }
 
       // Record start time for measuring response duration
       const startTime = Date.now();
 
-      // Send request to wake up ML server with a reasonable timeout
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 15000); // 15 seconds timeout
+      // Wait for all wake-up requests to complete
+      const results = await Promise.allSettled(wakeUpPromises);
 
-      const response = await fetch(mlServiceUrl, {
-        method: "GET",
-        signal: controller.signal,
+      // Calculate overall response duration
+      const responseDuration = Date.now() - startTime;
+      console.log(`Services response time: ${responseDuration}ms`);
+
+      // Analyze results from both services
+      let servicesAwake = 0;
+      let servicesWaking = 0;
+      let serviceErrors = 0;
+
+      results.forEach((result, index) => {
+        if (result.status === 'fulfilled') {
+          const { service, response, error } = result.value;
+          
+          if (response && response.ok) {
+            if (responseDuration < 3000) {
+              servicesAwake++;
+            } else {
+              servicesWaking++;
+            }
+          } else if (response && response.status === 503) {
+            servicesWaking++;
+          } else if (error) {
+            servicesWaking++;
+          } else {
+            servicesAwake++;
+          }
+        } else {
+          servicesWaking++;
+        }
       });
 
-      clearTimeout(timeoutId);
-
-      // Calculate response duration
-      const responseDuration = Date.now() - startTime;
-      console.log(`ML Service response time: ${responseDuration}ms`);
-
-      if (response.ok) {
-        // Try to read the response to get more information
-        let responseText = "";
-        try {
-          responseText = await response.text();
-        } catch (e) {
-          // Ignore text parsing errors
-        }
-
-        // If response is very fast (< 3 seconds), service was likely already running
-        // Also check if response contains typical running service indicators
-        if (
-          responseDuration < 3000 ||
-          responseText.includes("FastAPI") ||
-          responseText.includes("docs") ||
-          responseText.includes("openapi")
-        ) {
-          toast.success(
-            "ML services are already running and ready for predictions!"
-          );
-        } else {
-          toast.success(
-            "The ML server is waking up. Please wait a moment before predicting again."
-          );
-        }
-      } else if (response.status === 503) {
-        // Service unavailable - needs to wake up
-        toast.info(
-          "Wake up request sent. The ML server should be ready shortly."
+      // Display appropriate message based on results
+      if (servicesAwake === results.length) {
+        toast.success(
+          "Both ML and Backend services are already running and ready!"
+        );
+      } else if (servicesAwake > 0) {
+        toast.success(
+          "Some services are running, others are waking up. Please wait a moment."
         );
       } else {
-        // Other status codes - check if it's actually running but different endpoint
-        toast.success(
-          "ML services are already running and ready for predictions!"
+        toast.info(
+          "Wake up request sent to both ML and Backend services. Please wait a moment."
         );
       }
     } catch (error) {
       console.error("Wake up request error:", error);
 
-      if (error.name === "AbortError") {
-        // Request timed out - service is likely sleeping
-        toast.info(
-          "The ML server is starting up. Please wait a moment before predicting again."
-        );
-      } else if (error.message?.includes("fetch")) {
-        // Network error - service might be sleeping
-        toast.info(
-          "Wake up request sent. The ML server should be ready shortly."
-        );
-      } else {
-        // Other errors - still send wake up message
-        toast.info(
-          "Wake up request sent. The ML server should be ready shortly."
-        );
-      }
+      // Generic error handling for any unexpected errors
+      toast.info(
+        "Wake up request sent to services. Please wait a moment before trying again."
+      );
     } finally {
       setWakingUp(false);
     }
@@ -336,7 +357,7 @@ const PredictionForm = ({ onPredictionComplete }) => {
 
         {/* Buttons Row */}
         <div className="flex gap-3 mt-6">
-          {/* Wake Up ML Server Button */}
+          {/* Wake Up Services Button */}
           <button
             type="button"
             onClick={handleWakeUpML}
@@ -356,11 +377,11 @@ const PredictionForm = ({ onPredictionComplete }) => {
               <>
                 <div className="hidden md:flex items-center justify-center">
                   <Power className="w-4 h-4 mr-2" />
-                  Wake Up ML
+                  Wake Up
                 </div>
                 <div className="flex md:hidden items-center justify-center">
                   <Power className="w-4 h-4 mr-2" />
-                  Wake ML
+                  Wake Up
                 </div>
               </>
             )}
@@ -396,8 +417,7 @@ const PredictionForm = ({ onPredictionComplete }) => {
         {!loading && !wakingUp && (
           <p className="text-xs text-yellow-300">
             <strong>
-              For your first prediction, please wake up the ML service using the
-              Wake Up button.
+              Backend services may be sleeping. Please use the Wake Up button before making your first prediction.
             </strong>
           </p>
         )}
